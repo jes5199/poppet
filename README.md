@@ -8,7 +8,7 @@ OK 4.5. Automatically run programs for each inventory checkin
 6. Walk the graph
 7. Apply resources
 8. Provider: do something. a graph of states? Solve constraints?
-9. Generate report: original system state, actions performed, new system state. Components:
+9. Generate report: original system state, actions performed, new system state.
 
 
 use GPG instead of TLS.
