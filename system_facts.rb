@@ -11,6 +11,7 @@ facts = {
 }
 
 #   system_facts/flat/*
+# TODO: typecast numerics?
 Dir.glob( File.join( settings["facts"], "flat", "*" ) ) do |filename|
   name = File.basename(filename).sub(/\..*/,'')
   value = Poppet::Execute.execute(filename).chomp
