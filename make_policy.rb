@@ -5,6 +5,7 @@ settings = {
   :policy_makers => "policy_makers/*"
 }
 
+#TODO validate command line
 inventory = JSON.parse(File.read($1))
 #TODO validate schema
 

@@ -1,8 +1,9 @@
 Components:
 1. Run with cron
-2. Collect "facts" (System resource)
-3. (External node classification?)
-4. Run programs (build a graph)
+OK 2. Collect "facts" (System resource)
+OK 3. (External node classification?)
+OK 4. Run programs (build a graph)
+4.5. Automatically run programs for each inventory checkin
 5. Send over network
 6. Walk the graph
 7. Apply resources
