@@ -1,6 +1,10 @@
 require 'json'
 require 'lib/policy_maker'
 
+settings = {
+  :policy_makers => "policy/*.rb"
+}
+
 inventory = JSON.parse(File.read($1))
 #TODO validate schema
 
