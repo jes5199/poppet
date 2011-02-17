@@ -12,7 +12,6 @@ settings = {
 facts = {
 }
 
-# TODO get facts from directory of stuff
 #   system_facts/flat/*
 
 # TODO: refactor into two scripts (collection, announcement)
