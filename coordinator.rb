@@ -1,10 +1,13 @@
 require 'json'
-require 'lib/policy'
+require 'lib/policy_maker'
 
 inventory = JSON.parse(File.read($1))
 #TODO validate schema
 
-Poppet::Policy.each(settings[:policy]) do |policy|
-  policy.execute( inventory )
+policy = Policy.new
+Poppet::PolicyMaker.each(settings[:policy_makers]) do |policy_maker|
+  policy = policy.combine( policy_maker.execute( inventory ) )
 end
+
+puts( JSON.dump( policy.data ) )
 
