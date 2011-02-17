@@ -1,6 +1,7 @@
 require 'open3'
 require 'json'
 require 'lib/policy'
+require 'lib/execute'
 
 module Poppet
   class PolicyMaker
@@ -16,9 +17,8 @@ module Poppet
 
     def execute( inventory, options = {} )
       json_inventory = JSON.dump( inventory )
-      output, status = Open3.capture2(@filename, :stdin_data => json_inventory )
+      Poppet::Execute.execute(@filename, :stdin_data => json_inventory )
 
-      raise "got error code #{status} from #{inventory}" if status != 0
       results = JSON.parse( stdout.read )
       Poppet::Policy.new( results )
     end

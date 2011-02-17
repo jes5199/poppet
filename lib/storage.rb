@@ -2,9 +2,9 @@ require 'fileutils'
 require 'lib/timestamp'
 module Poppet
   module Storage
-    def file(name, &blk)
+    def self.file(name, &blk)
       FileUtils.mkdir_p( File.dirname(name) )
-      File.open(File.join(dir, name), &blk)
+      File.open(name, 'w', &blk)
     end
 
     def self.timestamp_file(dir, &blk)

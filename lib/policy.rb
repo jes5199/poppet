@@ -1,5 +1,5 @@
 module Poppet
-  module Policy
+  class Policy
     attr_reader :data
     def initialize( data = Policy.empty_data )
       @data = data
