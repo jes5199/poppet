@@ -2,7 +2,7 @@ require 'json'
 require 'lib/policy_maker'
 
 settings = {
-  :policy_makers => "policy/*.rb"
+  :policy_makers => "policy_makers/*"
 }
 
 inventory = JSON.parse(File.read($1))
