@@ -20,11 +20,12 @@ module Poppet
       [JSON::ParserError, Poppet::Execute::Error]
     end
 
-    def self.glob( glob, errors = [JSON::ParserError] )
+    def self.glob( glob, errors = expected_errors )
       Dir.glob( glob ).sort.each do |input_filename|
         begin
           yield(input_filename)
         rescue *errors => e
+          STDERR.puts( "While processing #{input_filename}:" )
           STDERR.puts( e )
           next
         end
