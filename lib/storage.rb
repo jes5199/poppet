@@ -1,6 +1,9 @@
+require 'rubygems'
+require 'json'
 require 'fileutils'
 require 'lib/timestamp'
 require 'lib/execute'
+require 'lib/struct'
 
 module Poppet
   module Storage
@@ -14,9 +17,24 @@ module Poppet
     end
 
     def self.map_files( glob, filter, target_dir )
-      Dir.glob( File.join( glob ) ) do |input_filename|
+      Dir.glob( glob ) do |input_filename|
         output_filename = File.join( target_dir, File.basename( input_filename ) )
         Poppet::Execute.execute( "#{filter} < #{input_filename} > #{output_filename}" )
+      end
+    end
+
+    def self.name_by( glob, struct_keys, target_dir )
+      Dir.glob( glob ).sort.each do |input_filename|
+        data = JSON.parse( File.read( input_filename ) )
+        name = Poppet::Struct.by_keys(data, struct_keys)
+        output_filename = File.join( target_dir, name )
+
+        if File.symlink?(output_filename)
+          current_dest = File.readlink(output_filename)
+          next if current_dest == input_filename
+          File.delete(output_filename)
+        end
+        File.symlink(input_filename, output_filename)
       end
     end
 
