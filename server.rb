@@ -1,5 +1,7 @@
+require 'rubygems'
 require 'sinatra'
-require 'lib/poppet'
+require 'lib/timestamp'
+require 'lib/storage'
 
 settings = {
   :inventory => 'public/inventory',
@@ -10,6 +12,8 @@ post '/inventory' do
   # TODO: check identity.
   # TODO: validate schema
   Poppet::Storage.timestamped_file(settings[:inventory]) do |f|
-    f.print(request.body)
+    request.body.each do |chunk|
+      f.print(chunk)
+    end
   end
 end

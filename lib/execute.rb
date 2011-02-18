@@ -9,8 +9,11 @@ module Poppet
         io.read
       end
       status = $?
-      raise "got error code #{status} from #{command}" if status != 0
+      raise self::Error, "got error code #{status} from #{command}" if status != 0
       output
+    end
+
+    class Error < RuntimeError
     end
   end
 end
