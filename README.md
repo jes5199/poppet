@@ -11,4 +11,6 @@ OK 4.5. Automatically run programs for each inventory checkin
 9. Generate report: original system state, actions performed, new system state.
 
 
-use GPG instead of TLS.
+OKish 10. use GPG instead of TLS.
+
+Ask the authority to sign the node's pubkey

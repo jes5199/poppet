@@ -1,5 +1,7 @@
 require 'fileutils'
 require 'lib/timestamp'
+require 'lib/execute'
+
 module Poppet
   module Storage
     def self.file(name, &blk)
@@ -13,6 +15,8 @@ module Poppet
 
     def self.map_files( glob, filter, target_dir )
       Dir.glob( File.join( glob ) ) do |input_filename|
+        output_filename = File.join( target_dir, File.basename( input_filename ) )
+        Poppet::Execute.execute( "#{filter} < #{input_filename} > #{output_filename}" )
       end
     end
 
