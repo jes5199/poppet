@@ -2,11 +2,12 @@ require 'open3'
 require 'json'
 require 'lib/policy'
 require 'lib/execute'
+require 'lib/storage'
 
 module Poppet
   class PolicyMaker
     def self.each(dir)
-      Dir.glob(dir) do |file|
+      Poppet::Storage.glob(dir) do |file|
         yield(self.new(file))
       end
     end

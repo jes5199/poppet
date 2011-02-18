@@ -1,8 +1,9 @@
 module Poppet
   class Policy
     attr_reader :data
-    def initialize( data = Policy.empty_data )
-      @data = data
+    def initialize( data = {}, name = nil )
+      @data = self.class.empty_data.merge(data)
+      @data["data"]["name"] = name if name
       # TODO validate schema
     end
 
@@ -10,7 +11,7 @@ module Poppet
       {
         "data" => {
           "resources" => {},
-          "orders"    => []
+          "orderings" => []
         }
       }
     end
@@ -19,7 +20,7 @@ module Poppet
       @data["data"]["resources"]
     end
 
-    def orders
+    def orderings
       @data["data"]["resources"]
     end
 
@@ -27,7 +28,7 @@ module Poppet
       Policy.new(
         :data => {
           :resources => combine_resources( self.resources, other.resources ),
-          :orders => combine_orders( self.orders, other.orders ),
+          :orderings => combine_orderings( self.orderings, other.orderings ),
         }
       )
     end
@@ -42,7 +43,7 @@ module Poppet
       }
     end
 
-    def combine_orders(p1, p2)
+    def combine_orderings(p1, p2)
       p1 + p2
       # TODO: look for cycles
     end
