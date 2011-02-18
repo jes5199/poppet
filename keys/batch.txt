@@ -1,0 +1,13 @@
+     %echo Generating a standard key
+     Key-Type: RSA
+     Key-Length: 1024
+     Name-Real: snub
+     Name-Comment: Poppet
+     Name-Email: poppet
+     Expire-Date: 0
+     Passphrase: poppet
+     %pubring keys/local.pub
+     %secring keys/local.sec
+     # Do a commit here, so that we can later print "done" :-)
+     %commit
+     %echo done
