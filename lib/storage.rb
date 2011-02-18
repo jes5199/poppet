@@ -19,7 +19,8 @@ module Poppet
     def self.map_files( glob, filter, target_dir )
       Dir.glob( glob ) do |input_filename|
         output_filename = File.join( target_dir, File.basename( input_filename ) )
-        Poppet::Execute.execute( "#{filter} < #{input_filename} > #{output_filename}" )
+        FileUtils.mkdir_p( File.dirname(output_filename) )
+        Poppet::Execute.execute( "#{filter} < #{input_filename.inspect} > #{output_filename.inspect}" )
       end
     end
 

@@ -3,16 +3,13 @@ require 'lib/execute'
 
 settings = {
   "inventory" => 'public/inventory',
-  "policy" => 'public/policy',
+  "policy"    => 'public/policy',
+  "name_by"   => ['hostname'],
 }
 
-Dir.glob(File.join(settings["inventory"], "*")) do |inventory_filename|
-  basename = File.basename(inventory_filename)
-  policy_filename = File.join(settings["policy"], basename)
-  if ! File.exist?(policy_filename)
-    output = Poppet::Execute.execute( "ruby make_policy.rb #{ inventory_filename.inspect }" )
-    Poppet::Storage.file(policy_filename) do |f|
-      f.print(output)
-    end
-  end
-end
+by_time = File.join(settings["inventory"], "by_time", "*")
+by_name = File.join(settings["inventory"], "by_name")
+Poppet::Storage.name_by( by_time, settings["name_by"], by_name )
+
+policy_by_time = File.join( settings["policy"], "by_time")
+Poppet::Storage.map_files( by_time, 'ruby make_policy.rb', policy_by_time )
