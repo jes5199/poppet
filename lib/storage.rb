@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'json'
 require 'fileutils'
+require 'pathname'
 require 'lib/timestamp'
 require 'lib/execute'
 require 'lib/struct'
@@ -23,6 +24,8 @@ module Poppet
     def self.glob( glob, errors = expected_errors )
       Dir.glob( glob ).sort.each do |input_filename|
         begin
+          input_filename = Pathname.new(input_filename).realpath.to_s
+          p input_filename
           yield(input_filename)
         rescue *errors => e
           STDERR.puts( "While processing #{input_filename}:" )
@@ -57,7 +60,7 @@ module Poppet
           File.delete(output_filename)
         end
         make_dir_for( output_filename )
-        File.symlink(input_filename, output_filename)
+        File.symlink( input_filename, output_filename)
       end
     end
 

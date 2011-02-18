@@ -7,9 +7,13 @@ settings = {
   "name_by"   => ['hostname'],
 }
 
-by_time = File.join(settings["inventory"], "by_time", "*")
-by_name = File.join(settings["inventory"], "by_name")
-Poppet::Storage.name_by( by_time, settings["name_by"], by_name )
+inv_by_time = File.join(settings["inventory"], "by_time", "*")
+inv_by_name = File.join(settings["inventory"], "by_name")
+Poppet::Storage.name_by( inv_by_time, settings["name_by"], inv_by_name )
 
-policy_by_time = File.join( settings["policy"], "by_time")
-Poppet::Storage.map_files( by_time, 'ruby make_policy.rb', policy_by_time )
+pol_by_time = File.join( settings["policy"], "by_time")
+Poppet::Storage.map_files( inv_by_time, 'ruby make_policy.rb', pol_by_time )
+
+pol_by_time_glob = File.join(settings["policy"], "by_time", "*")
+pol_by_name = File.join(settings["policy"], "by_name")
+Poppet::Storage.name_by(pol_by_time_glob, ["data", "name"], pol_by_name )

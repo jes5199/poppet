@@ -4,8 +4,12 @@ require 'lib/timestamp'
 require 'lib/storage'
 
 settings = {
+  :public    => 'public',
   :inventory => 'public/inventory',
 }
+
+
+set :public, "./public"
 
 post '/inventory' do
   # save System to inventory
