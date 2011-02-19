@@ -25,7 +25,6 @@ module Poppet
       Dir.glob( glob ).sort.each do |input_filename|
         begin
           input_filename = Pathname.new(input_filename).realpath.to_s
-          p input_filename
           yield(input_filename)
         rescue *errors => e
           STDERR.puts( "While processing #{input_filename}:" )
@@ -43,7 +42,8 @@ module Poppet
       self.glob( glob ) do |input_filename|
         output_filename = File.join( target_dir, File.basename( input_filename ) )
         make_dir_for( output_filename )
-        Poppet::Execute.execute( "#{filter} < #{input_filename.inspect} > #{output_filename.inspect}" )
+        content = Poppet::Execute.execute( "#{filter} < #{input_filename.inspect}" )
+        File.open( output_filename, "w" ){|f| f.puts(content) }
       end
     end
 

@@ -13,5 +13,15 @@ module Poppet
         end.body
       end
     end
+
+    def self.get(uri)
+      uri = URI.parse(uri)
+      Net::HTTP.start(uri.host, uri.port) do |http|
+        request = Net::HTTP::Get.new(uri.request_uri)
+        http.request(request) do |response|
+          response.value #raises error if not 2xx
+        end.body
+      end
+    end
   end
 end

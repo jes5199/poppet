@@ -11,7 +11,8 @@ module Poppet
       {
         "data" => {
           "resources" => {},
-          "orderings" => []
+          "orderings" => [],
+          "name"      => ""
         }
       }
     end
@@ -21,26 +22,28 @@ module Poppet
     end
 
     def orderings
-      @data["data"]["resources"]
+      @data["data"]["orderings"]
+    end
+
+    def name
+      @data["data"]["name"]
     end
 
     def combine( other )
       Policy.new(
-        :data => {
-          :resources => combine_resources( self.resources, other.resources ),
-          :orderings => combine_orderings( self.orderings, other.orderings ),
+        "data" => {
+          "resources"=> combine_resources( self.resources, other.resources ),
+          "orderings"=> combine_orderings( self.orderings, other.orderings ),
+          "name"     => self.name || other.name,
         }
       )
     end
 
     private
     def combine_resources(r1, r2)
-      r1.dup.tap{|r|
-        r2.each do |key, res|
-          raise "duplicate resource key #{key}" if r[key]
-          r[key] = res
-        end
-      }
+      dups = r1.keys - r2.keys
+      raise "duplicate resource keys #{dups.inspect}" if ! dups.empty?
+      r1.merge(r2)
     end
 
     def combine_orderings(p1, p2)

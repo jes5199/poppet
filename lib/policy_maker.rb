@@ -18,9 +18,9 @@ module Poppet
 
     def execute( inventory, options = {} )
       json_inventory = JSON.dump( inventory )
-      Poppet::Execute.execute(@filename, :stdin_data => json_inventory )
+      data = Poppet::Execute.execute(@filename, :stdin_data => json_inventory )
 
-      results = JSON.parse( stdout.read )
+      results = JSON.parse( data )
       Poppet::Policy.new( results )
     end
   end

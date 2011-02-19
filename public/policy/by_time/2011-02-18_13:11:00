@@ -1,1 +1,1 @@
-{"data":{"name":"snub","resources":{},"orderings":[]}}
+{"data":{"name":"snub","resources":{"my directory":{"type":"directory","path":"/tmp/poppet"},"my file":{"type":"file","content":"Hello, world","path":"/tmp/poppet/file"}},"orderings":["my directory","my file"]}}
