@@ -1,4 +1,4 @@
-module JSONShape
+module JsonShape
   class IsDefinition
     attr :name, :params
 
@@ -75,8 +75,10 @@ module JSONShape
           val = object.has_key?(name) ? object[name] : :undefined
           schema_check( val, spec, schema )
         end
-        extras = object.keys - kind.members.keys
-        raise "#{extras.inspect} are not valid members" if extras != []
+        if kind.permissive != true
+          extras = object.keys - kind.members.keys
+          raise "#{extras.inspect} are not valid members" if extras != []
+        end
       end
 
     # obvious extensions
@@ -102,8 +104,9 @@ module JSONShape
 
     when IsDefinition["tuple"]
       schema_check( object, "array", schema )
-      raise "tuple is the wrong size" if object.length != kind.elements!.length
-      kind.elements!.zip(object).each do |spec, value|
+      raise "tuple is the wrong size" if object.length > kind.elements!.length
+      undefineds = [:undefined] * (kind.elements!.length - object.length)
+      kind.elements!.zip(object + undefineds).each do |spec, value|
         schema_check( value, spec, schema )
       end
 
@@ -121,6 +124,9 @@ module JSONShape
           false
         end
       end or raise "#{object.inspect} does not match any of #{kind.choices.inspect}"
+
+    when IsDefinition["optional"]
+      object == :undefined or schema_check( object, kind.params, schema )
 
     when IsDefinition["restrict"]
       if kind.require?

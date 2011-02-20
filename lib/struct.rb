@@ -5,7 +5,7 @@ module Poppet
       self.new(data).by_keys(keys)
     end
 
-    def initalize( data )
+    def initialize( data )
       @data = data
     end
 
@@ -22,6 +22,34 @@ module Poppet
 
     def validate
       JsonShape.schema_check( @data, kind, schema )
+    end
+
+    def self.schema
+      {
+        "struct" => ["object", {
+          "members" => {
+            "type"    => "string",
+            "version" => "string",
+            "data"    => "object",
+            "meta"    => ["optional", "object"],
+          }
+        }]
+      }
+    end
+
+    def related_classes
+      []
+    end
+
+    def schema
+      (self.class.ancestors.map{|a| a.schema if a.respond_to?(:schema)}.compact + related_classes.map{|x| x.schema}).inject({}) do |r, sch|
+        # TODO: check for collisions
+        r.update(sch)
+      end
+    end
+
+    def kind
+      self.class.name.sub(/.*::/, "").downcase
     end
   end
 end

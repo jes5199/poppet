@@ -8,9 +8,29 @@ module Poppet
       validate
     end
 
+    def self.schema
+      {
+        "policy"    => ["restrict", {"require" => ["struct", "_policy_0"] } ], # TODO: build versioned eithers
+        "_policy_0" => ["object",
+          {
+            "members" =>
+              { "data"       => "_policy_data_0",
+                "meta"       => "undefined",
+                "type"       => ["literal", "policy"],
+                "version"    => ["literal", "0"],
+              },
+          } ],
+        "_policy_data_0" => [ "object", { "members" =>
+          {
+            "resources" => "dictionary", # FIXME: of resources
+            "name"      => "string",
+          } } ],
+      }
+    end
+
     def self.empty_data
       {
-        "version" => 0,
+        "version" => "0",
         "type" => "policy",
         "data" => {
           "resources" => {},
