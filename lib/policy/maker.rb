@@ -5,7 +5,7 @@ require 'lib/execute'
 require 'lib/storage'
 
 module Poppet
-  class PolicyMaker
+  class Policy::Maker
     def self.each(dir)
       Poppet::Storage.glob(dir) do |file|
         yield(self.new(file))
