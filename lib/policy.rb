@@ -1,11 +1,15 @@
 require 'lib/struct'
 module Poppet
-  class Policy < Struct # FIXME
+  class Policy < Struct
     attr_reader :data
     def initialize( data = {}, name = nil )
       @data = self.class.empty_data.merge(data)
       @data["data"]["name"] = name if name
       validate
+    end
+
+    def related_classes
+      [ Poppet::Resource ]
     end
 
     def self.schema
@@ -22,7 +26,7 @@ module Poppet
           } ],
         "_policy_data_0" => [ "object", { "members" =>
           {
-            "resources" => "dictionary", # FIXME: of resources
+            "resources" => ["dictionary", {"contents" => "resource"} ],
             "name"      => "string",
           } } ],
       }
