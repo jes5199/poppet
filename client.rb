@@ -1,5 +1,6 @@
 require 'lib/http'
 require 'lib/policy/applier'
+require 'lib/execute'
 require 'rubygems'
 require 'json'
 
@@ -14,5 +15,6 @@ json = Poppet::HTTP.get(settings["server"] + "/by_name/" + name )
 applier = Poppet::Policy::Applier.new( JSON.parse( json ) )
 
 applier.each do |res|
-  p res
+  p Poppet::Execute.execute( provider, JSON.dump( [ "change", res ] ) )
+  #TODO build a report
 end
