@@ -51,5 +51,22 @@ module Poppet
     def kind
       self.class.name.sub(/.*::/, "").downcase
     end
+
+    def self.schema_for( type, version, data_def, meta_def, abstract = false )
+      {
+        type    => ["restrict", {"require" => ["struct", "_#{type}_#{version}"] } ], # TODO: build versioned eithers
+        "_#{type}_#{version}" => ["object",
+          {
+            "members" =>
+              { "data"       => "_#{type}_data_#{version}",
+                "meta"       => "_#{type}_meta_#{version}",
+                "type"       => ( abstract ? "string" : ["literal", type] ),
+                "version"    => ["literal", version],
+              },
+          } ],
+        "_#{type}_data_#{version}" => data_def,
+        "_#{type}_meta_#{version}" => meta_def,
+      }
+    end
   end
 end
