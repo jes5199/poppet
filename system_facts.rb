@@ -22,7 +22,6 @@ end
 #   system_facts/structured/*
 Dir.glob( File.join( settings["facts"], "structured", "*" ) ) do |filename|
   json = Poppet::Execute.execute(filename)
-  # TODO validate schema
   facts.merge!( JSON.parse( json ) )
 end
 
