@@ -20,7 +20,7 @@ module Poppet
       data
     end
 
-    def validate
+    def validate!
       JsonShape.schema_check( @data, kind, schema )
     end
 
@@ -49,12 +49,12 @@ module Poppet
     end
 
     def kind
-      self.class.name.sub(/.*::/, "").downcase
+      self.class.name.sub(/^.*::/, "").downcase.gsub('::', '/')
     end
 
     def self.schema_for( type, version, data_def, meta_def, parent = "struct", abstract = false )
       {
-        type    => ["restrict", {"require" => [parents, "_#{type}_#{version}"] } ], # TODO: build versioned eithers
+        type    => ["restrict", {"require" => [parent, "_#{type}_#{version}"] } ], # TODO: build versioned eithers
         "_#{type}_#{version}" => ["object",
           {
             "members" =>

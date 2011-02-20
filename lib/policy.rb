@@ -5,7 +5,7 @@ module Poppet
     def initialize( data = {}, name = nil )
       @data = self.class.empty_data.merge(data)
       @data["data"]["name"] = name if name
-      validate
+      validate!
     end
 
     def related_classes
@@ -13,23 +13,14 @@ module Poppet
     end
 
     def self.schema
-      {
-        "policy"    => ["restrict", {"require" => ["struct", "_policy_0"] } ], # TODO: build versioned eithers
-        "_policy_0" => ["object",
-          {
-            "members" =>
-              { "data"       => "_policy_data_0",
-                "meta"       => "undefined",
-                "type"       => ["literal", "policy"],
-                "version"    => ["literal", "0"],
-              },
-          } ],
-        "_policy_data_0" => [ "object", { "members" =>
-          {
-            "resources" => ["dictionary", {"contents" => "resource"} ],
-            "name"      => "string",
-          } } ],
-      }
+      Struct.schema_for(
+        "policy", "0",
+        {
+          "resources" => ["dictionary", {"contents" => "resource"} ],
+          "name"      => "string",
+        },
+        "undefined"
+      )
     end
 
     def self.empty_data

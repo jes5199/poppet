@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'json'
 require 'lib/execute'
+require 'lib/resource/system'
 
 
 settings = {
@@ -25,7 +26,9 @@ Dir.glob( File.join( settings["facts"], "structured", "*" ) ) do |filename|
   facts.merge!( JSON.parse( json ) )
 end
 
-puts JSON.dump( facts )
+system_resource = Poppet::Resource::System.new(facts)
+
+puts JSON.dump( system_resource.data )
 
 
 

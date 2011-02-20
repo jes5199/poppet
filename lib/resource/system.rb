@@ -1,13 +1,18 @@
-require 'lib/struct'
+require 'lib/resource'
 module Poppet
   class Resource::System < Resource
-    def self.schema
-      {
-        "resource::system"  => ["restrict", {"require" => ["resource", "_resource::system"] } ], # TODO: "inherits" on "object" ?
-        "_resource::system" => "object",
-        # TODO: data is a dictionary
-        # TODO: meta is undefined
+    attr :data
+    def initialize( facts )
+      @data = {
+        "version" => "0",
+        "type" => "system",
+        "data" => facts,
       }
+      validate!
+    end
+
+    def self.schema
+      Struct.schema_for( "system", "0", "object", "undefined", "resource", false )
     end
   end
 end

@@ -73,9 +73,10 @@ module JsonShape
       if kind.members?
         kind.members.each do |name, spec|
           val = object.has_key?(name) ? object[name] : :undefined
+          next if val == :undefined and kind.allow_missing
           schema_check( val, spec, schema )
         end
-        if kind.permissive != true
+        if kind.allow_extra != true
           extras = object.keys - kind.members.keys
           raise "#{extras.inspect} are not valid members" if extras != []
         end
