@@ -2,6 +2,7 @@ require 'rubygems'
 require 'json'
 
 require 'lib/resource'
+require 'lib/implementor/reader'
 
 command, desired_json = JSON.parse( STDIN.read )
 desired = Poppet::Resource.new( desired_json )
@@ -16,6 +17,39 @@ end
 # TODO For "check", return if it matches desired
 
 # TODO For "survey", return what was on disk (for specified attrs)
+
+system = Poppet::Implementor::Reader.new do
+  attribute( "exists" ) do
+    read { execute_test( "test", "-e", attribute["path"] ) }
+
+    within( literal( true ) ) do
+      attribute( "mode" ) do
+        read { execute( "stat -c %a", attribute["path"] ) }
+      end
+
+      attribute( "owner" ) do
+        read { execute( "stat -c %U", attribute["path"] ) }
+      end
+
+      attribute( "group" ) do
+        read { execute( "stat -c %G", attribute["path"] ) }
+      end
+
+      attribute( "content" ) do
+        read { execute( "cat", attribute["path"] ) }
+      end
+
+      attribute( "checksum" ) do
+        read { execute( "md5sum", attribute["path"] ) }
+      end
+
+    end
+
+  end
+end
+
+p system
+exit
 
 def write_file( path, content )
   #TODO: sudo
@@ -43,7 +77,7 @@ within( {"exists" => literal(true)} ) do
     execute( "chmod", desired["mode"], desired["path"])
   end
 
-  change( { "user" => either(string, integer) }, { "user" => either(string, integer) } ) do
-    execute( "chown", desired["user"], desired["path"])
+  change( { "owner" => either(string, integer) }, { "owner" => either(string, integer) } ) do
+    execute( "chown", desired["owner"], desired["path"])
   end
 end
