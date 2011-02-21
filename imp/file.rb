@@ -27,17 +27,17 @@ reader = Poppet::Implementor::Reader.new({
 
   "mode"   => [
     { "exists" => [ "literal", true ] },
-    lambda { execute( "stat -c %a", desired["path"] ) }
+    lambda { execute( "stat -c %a", desired["path"] ).chomp }
   ],
 
   "owner" => [
     { "exists" => [ "literal", true ] },
-    lambda { execute( "stat -c %U", desired["path"] ) }
+    lambda { execute( "stat -c %U", desired["path"] ).chomp }
   ],
 
   "group" => [
     { "exists" => [ "literal", true ] },
-    lambda { execute( "stat -c %G", desired["path"] ) }
+    lambda { execute( "stat -c %G", desired["path"] ).chomp }
   ],
 
   "content" => [
