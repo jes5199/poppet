@@ -63,7 +63,7 @@ end
 
 writer = Poppet::Implementor::Writer.new([ # state machine
   [
-    {"exists" => ["literal", true ] },
+    {"exists" => ["literal", true]},
     lambda do |w, actual, desired|
       w.really do
         execute( "rm", desired["path"] ) # in traditional unix style, let's remove files and symlinks but not directories.
@@ -101,32 +101,43 @@ writer = Poppet::Implementor::Writer.new([ # state machine
   [
     { "exists" => ["literal", true], "mode" => "string" },
     lambda do |w, actual, desired|
-      w.really do
-        execute( "chmod", desired["mode"], desired["path"] )
+      ch = simulated_chmod( actual["mode"], desired["mode"] )
+      if ch == actual["mode"]
+        {}
+      else
+        w.really do
+          execute( "chmod", desired["mode"], desired["path"] )
+        end
+        { "mode"    => ch }
       end
-      { "mode"    => simulated_chmod( actual["mode"], desired["mode"] ) }
     end
   ],
 
   [
     { "exists" => ["literal", true], "owner" => "string" },
     lambda do |w, actual, desired|
-      return {} if numeric_user( desired["owner"] ) == numeric_user( actual["owner"] )
-      w.really do
-        execute( "chown", desired["owner"], desired["path"] )
+      if numeric_user( desired["owner"] ) == numeric_user( actual["owner"] )
+        {}
+      else
+        w.really do
+          execute( "chown", desired["owner"], desired["path"] )
+        end
+        { "owner" => desired["owner"] }
       end
-      { "owner" => desired["owner"] }
     end
   ],
 
   [
     { "exists" => ["literal", true], "group" => "string" },
     lambda do |w, actual, desired|
-      return {} if numeric_group( desired["group"] ) == numeric_group( actual["group"] )
-      w.really do
-        execute( "chown", desired["group"], desired["path"] )
+      if numeric_group( desired["group"] ) == numeric_group( actual["group"] )
+        {}
+      else
+        w.really do
+          execute( "chown", desired["group"], desired["path"] )
+        end
+        { "group" => desired["group"] }
       end
-      { "group" => desired["group"] }
     end
   ]
 ])
