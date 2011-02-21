@@ -1,6 +1,7 @@
 require 'lib/execute'
 require 'lib/resource'
 require 'lib/success'
+require 'lib/events'
 require 'rubygems'
 require 'json'
 
@@ -24,13 +25,13 @@ module Poppet
       [ Poppet::Events.new( events ), Poppet::Resource.new( resource ) ]
     end
 
-    def initialize(name)
-      @name = name
+    def initialize(path)
+      @path = path
     end
 
     private
     def execute( data )
-      JSON.parse( Poppet::Execute.execute( @name, JSON.dump( data ) ) )
+      JSON.parse( Poppet::Execute.execute( @path, JSON.dump( data ) ) )
     end
   end
 end

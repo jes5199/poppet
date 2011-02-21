@@ -7,6 +7,7 @@ module Poppet
 
     def initialize( data )
       @data = data
+      validate!
     end
 
     def by_keys( keys )
