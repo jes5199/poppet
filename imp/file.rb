@@ -63,10 +63,10 @@ checker = Poppet::Implementor::Checker.new({
   "checksum" => lambda{ |actual, desired| actual == desired },
 })
 
-def write_file( path, content )
+def write_file( w, path, content )
   #TODO: sudo
   #TODO: umode
-  execute( "echo", content, :output => path )
+  w.execute( "echo", content, :output => path )
   set( "content", content )
 end
 
@@ -87,9 +87,7 @@ writer = Poppet::Implementor::Writer.new([ # state machine
   [
     {"exists" => ["literal", false]},
     lambda do |w, actual, desired|
-      w.really do
-        write_file( desired )
-      end
+      write_file( w, desired )
       {
         "exists"  => true,
         "path"    => desired["path"],
@@ -103,9 +101,7 @@ writer = Poppet::Implementor::Writer.new([ # state machine
   [
     { "exists" => ["literal", true], "content" => "string" },
     lambda do |w, actual, desired|
-      w.really do
-        write_file( "echo", desired["content"], desired["path"] )
-      end
+      write_file( w, "echo", desired )
       { "content" => desired["content"] }
     end
   ],
@@ -114,19 +110,15 @@ writer = Poppet::Implementor::Writer.new([ # state machine
     { "exists" => ["literal", true], "mode" => "string" },
     lambda do |w, actual, desired|
       mod = simulated_chmod( actual["mode"], desired["mode"] )
-      w.really do
-        execute( "chmod", desired["mode"], desired["path"] )
-      end
-      actual.merge( "mode"    => mod )
+      w.execute( "chmod", desired["mode"], desired["path"] )
+      actual.merge( "mode" => mod )
     end
   ],
 
   [
     { "exists" => ["literal", true], "owner" => "string" },
     lambda do |w, actual, desired|
-      w.really do
-        execute( "chown", desired["owner"], desired["path"] )
-      end
+      w.execute( "chown", desired["owner"], desired["path"] )
       actual.merge( "owner" => desired["owner"] )
     end
   ],
@@ -134,9 +126,7 @@ writer = Poppet::Implementor::Writer.new([ # state machine
   [
     { "exists" => ["literal", true], "group" => "string" },
     lambda do |w, actual, desired|
-      w.really do
-        execute( "chown", desired["group"], desired["path"] )
-      end
+      w.execute( "chown", desired["group"], desired["path"] )
       actual.merge( "group" => desired["group"] )
     end
   ]

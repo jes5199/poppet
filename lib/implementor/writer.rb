@@ -17,24 +17,28 @@ module Poppet
       do_rules(actual, rules, Really.new, actual, desired)
     end
 
-    class Really
+    class Action
+      def really
+        raise "virtual"
+      end
+
+      def execute( *command )
+        puts command.inspect
+        really do
+          #TODO: actually execute the command
+        end
+      end
+    end
+
+    class Really < Action
       def really
         yield
       end
-
-      def execute( *command )
-        puts command.inspect # TODO
-      end
-
     end
 
-    class Simulate
+    class Simulate < Action
       def really
         # noop
-      end
-
-      def execute( *command )
-        puts command.inspect # TODO: logging, reporting
       end
     end
   end
