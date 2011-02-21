@@ -64,21 +64,20 @@ end
 writer = Poppet::Implementor::Writer.new([ # state machine
   [
     {"exists" => ["literal", true ] },
-    {"exists" => ["literal", false] },
     lambda do |w, actual, desired|
-      w.really{
+      w.really do
         execute( "rm", desired["path"] ) # in traditional unix style, let's remove files and symlinks but not directories.
-      }
+      end
       { "exists" => false }
     end
   ],
+
   [
     {"exists" => ["literal", false]},
-    {"exists" => ["literal", true ]},
     lambda do |w, actual, desired|
-      w.really {
+      w.really do
         write_file( desired )
-      }
+      end
       {
         "exists"  => true,
         "path"    => desired["path"],
@@ -91,53 +90,43 @@ writer = Poppet::Implementor::Writer.new([ # state machine
 
   [
     { "exists" => ["literal", true], "content" => "string" },
-    { "exists" => ["literal", true], "content" => "string" },
     lambda do |w, actual, desired|
-      w.really {
+      w.really do
         write_file( "echo", desired["content"], desired["path"] )
-      }
+      end
       { "content" => desired["content"] }
     end
   ],
 
   [
     { "exists" => ["literal", true], "mode" => "string" },
-    { "exists" => ["literal", true], "mode" => "string" },
     lambda do |w, actual, desired|
-      w.really {
+      w.really do
         execute( "chmod", desired["mode"], desired["path"] )
-      }
-      {
-        "mode"    => simulated_chmod( actual["mode"], desired["mode"] ),
-      }
+      end
+      { "mode"    => simulated_chmod( actual["mode"], desired["mode"] ) }
     end
   ],
 
   [
-    { "exists" => ["literal", true], "owner" => "string" },
     { "exists" => ["literal", true], "owner" => "string" },
     lambda do |w, actual, desired|
       return {} if numeric_user( desired["owner"] ) == numeric_user( actual["owner"] )
-      w.really {
+      w.really do
         execute( "chown", desired["owner"], desired["path"] )
-      }
-      {
-        "owner" => desired["owner"]
-      }
+      end
+      { "owner" => desired["owner"] }
     end
   ],
 
   [
     { "exists" => ["literal", true], "group" => "string" },
-    { "exists" => ["literal", true], "group" => "string" },
     lambda do |w, actual, desired|
       return {} if numeric_group( desired["group"] ) == numeric_group( actual["group"] )
-      w.really {
+      w.really do
         execute( "chown", desired["group"], desired["path"] )
-      }
-      {
-        "group" => desired["group"]
-      }
+      end
+      { "group" => desired["group"] }
     end
   ]
 ])
