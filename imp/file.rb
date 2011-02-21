@@ -18,36 +18,40 @@ end
 
 # TODO For "survey", return what was on disk (for specified attrs)
 
-system = Poppet::Implementor::Reader.new do
-  attribute( "exists" ) do
-    read { execute_test( "test", "-e", attribute["path"] ) }
+system = Poppet::Implementor::Reader.new(
+  [ "attribute", "path", {
+    "read" => lambda { desired["path"] }
+  } ],
+  [ "attribute", "exists", {
+    "read" => lambda { execute_test( "test", "-e", desired["path"] ) },
 
-    within( literal( true ) ) do
-      attribute( "mode" ) do
-        read { execute( "stat -c %a", attribute["path"] ) }
-      end
+    ["within", [ "literal", true ] ] => [
 
-      attribute( "owner" ) do
-        read { execute( "stat -c %U", attribute["path"] ) }
-      end
+      [ "attribute", "mode", {
+        "read" => lambda { execute( "stat -c %a", desired["path"] ) }
+      } ],
 
-      attribute( "group" ) do
-        read { execute( "stat -c %G", attribute["path"] ) }
-      end
+      [ "attribute", "owner", {
+        "read" => lambda { execute( "stat -c %U", desired["path"] ) }
+      } ],
 
-      attribute( "content" ) do
-        read { execute( "cat", attribute["path"] ) }
-      end
+      [ "attribute", "group", {
+        "read" => lambda { execute( "stat -c %G", desired["path"] ) }
+      } ],
 
-      attribute( "checksum" ) do
-        read { execute( "md5sum", attribute["path"] ) }
-      end
+      [ "attribute", "content", {
+        "read" => lambda { execute( "cat", desired["path"] ) }
+      } ],
 
-    end
+      [ "attribute", "checksum", {
+        "read" => lambda { execute( "md5sum", desired["path"] ) }
+      } ]
 
-  end
-end
+    ]
+  } ]
+)
 
+p system
 p system
 exit
 
