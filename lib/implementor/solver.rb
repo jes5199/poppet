@@ -1,3 +1,4 @@
+require 'lib/resource'
 require 'lib/implementor/implementation'
 
 module Poppet
@@ -20,6 +21,14 @@ module Poppet
         raise "#{key} doesn't match" unless @checker.check(key, @reader, @desired)
       end
       return true
+    end
+
+    def survey
+      res = Poppet::Resource.new({ })
+      @desired.keys.each do |key|
+        res[key] = @reader[key]
+      end
+      puts JSON.dump(res.data)
     end
   end
 end
