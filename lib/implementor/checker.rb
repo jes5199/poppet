@@ -1,17 +1,15 @@
 require 'lib/implementor/implementation'
 
 module Poppet
-  class Implementor::Reader < Implementor::Implementation
+  class Implementor::Checker < Implementor::Implementation
     def initialize(rules)
       @rules = rules
       @known = {}
     end
 
-    def [](name)
-      return @known[name] if @known[name]
-
+    def check(name, actual, desired)
       rules = @rules[name]
-      do_rules(self, rules)
+      do_rules(nil, rules, actual[name], desired[name])
     end
   end
 end

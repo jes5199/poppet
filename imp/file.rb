@@ -51,13 +51,6 @@ reader = Poppet::Implementor::Reader.new({
   ]
 })
 
-def write_file( path, content )
-  #TODO: sudo
-  #TODO: umode
-  execute( "echo", content, :output => path )
-  set( "content", content )
-end
-
 checker = Poppet::Implementor::Checker.new({
   "path"     => lambda{ |actual, desired| actual == desired },
   "exists"   => lambda{ |actual, desired| actual == desired },
@@ -69,6 +62,13 @@ checker = Poppet::Implementor::Checker.new({
   "group"    => lambda{ |actual, desired| numeric_group( desired["owner"] ) == numeric_group( actual["owner"] ) },
   "checksum" => lambda{ |actual, desired| actual == desired },
 })
+
+def write_file( path, content )
+  #TODO: sudo
+  #TODO: umode
+  execute( "echo", content, :output => path )
+  set( "content", content )
+end
 
 writer = Poppet::Implementor::Writer.new([ # state machine
   [
