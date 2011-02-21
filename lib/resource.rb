@@ -8,6 +8,10 @@ module Poppet
     def [](name)
       @data["data"][name]
     end
+
+    def keys
+      @data["data"].keys
+    end
   end
 end
 

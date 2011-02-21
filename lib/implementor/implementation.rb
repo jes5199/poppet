@@ -6,7 +6,7 @@ module Poppet
     private
     def do_rules( res, rules, *args )
       r = nil
-      rules.each do |rule|
+      Array(rules).each do |rule|
         if rule.is_a?(Hash)
           r = ( JsonShape.schema_check( res, ["object", {"members" => rule, "allow_extra" => true}] ) || true rescue false )
         elsif rule.respond_to? :call

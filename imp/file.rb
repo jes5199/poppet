@@ -3,6 +3,9 @@ require 'json'
 
 require 'lib/resource'
 require 'lib/implementor/reader'
+require 'lib/implementor/checker'
+require 'lib/implementor/writer'
+require 'lib/implementor/solver'
 
 command, desired_json = JSON.parse( STDIN.read )
 desired = Poppet::Resource.new( desired_json )
@@ -102,7 +105,7 @@ writer = Poppet::Implementor::Writer.new([ # state machine
     { "exists" => ["literal", true], "content" => "string" },
     lambda do |w, actual, desired|
       write_file( w, "echo", desired )
-      { "content" => desired["content"] }
+      actual.merge( "content" => desired["content"] )
     end
   ],
 
@@ -132,7 +135,4 @@ writer = Poppet::Implementor::Writer.new([ # state machine
   ]
 ])
 
-writer.send()
-# TODO For "check", return if it matches desired
-# TODO For "survey", return what was on disk (for specified attrs)
-
+Poppet::Implementor::Solver.new( reader, desired, checker, writer ).do( command )
