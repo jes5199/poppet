@@ -2,20 +2,27 @@
 
 print <<-JSON
 {
-  "version": 0,
+  "version": "0",
+  "type": "policy",
   "data": {
     "resources": {
       "my directory": {
+        "version": "0",
         "type": "directory",
-        "path": "/tmp/poppet"
+        "data": {
+          "path": "/tmp/poppet"
+        }
       },
       "my file": {
         "type": "file",
-        "path": "/tmp/poppet/file",
-        "content": "Hello, world"
+        "version": "0",
+        "type": "file",
+        "data": {
+          "path": "/tmp/poppet/file",
+          "content": "Hello, world"
+        }
       }
     },
-    "orderings": ["my directory", "my file"]
   }
 }
 JSON
