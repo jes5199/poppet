@@ -21,9 +21,9 @@ end
 
 # Find the file
 reader = Poppet::Implementor::Reader.new({
-  "path" => [ lambda { desired["path"] } ],
+  "path" => lambda { desired["path"] },
 
-  "exists" => [ lambda { execute_test( "test", "-e", desired["path"] ) } ],
+  "exists" => lambda { execute_test( "test", "-e", desired["path"] ) },
 
   "mode"   => [
     { "exists" => [ "literal", true ] },
@@ -64,7 +64,7 @@ checker = Poppet::Implementor::Checker.new({
   "content"  => lambda{ |actual, desired| actual == desired },
   "mode"     => lambda do |actual, desired|
                  simulated_chmod( actual["mode"], desired["mode"] ) == actual["mode"]
-               end,
+                end,
   "owner"    => lambda{ |actual, desired| numeric_user(  desired["owner"] ) == numeric_user(  actual["owner"] ) },
   "group"    => lambda{ |actual, desired| numeric_group( desired["owner"] ) == numeric_group( actual["owner"] ) },
   "checksum" => lambda{ |actual, desired| actual == desired },
