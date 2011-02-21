@@ -12,48 +12,55 @@ if ! desired["path"]
   raise "Sorry, I don't support finding a file without a path."
 end
 
-# TODO Find the file
+def execute_test(*args)
+  false # FIXME
+end
+def execute(*args)
+  `#{args.join(" ")}` # FIXME
+end
+
+# Find the file
+system = Poppet::Implementor::Reader.new({
+  "path" => {
+    "read" => lambda { desired["path"] }
+  },
+  "exists" => {
+    "read" => lambda { execute_test( "test", "-e", desired["path"] ) },
+
+    "within" => { [ "literal", true ] => {
+
+      "mode" => {
+        "read" => lambda { execute( "stat -c %a", desired["path"] ) }
+      },
+
+      "owner" => {
+        "read" => lambda { execute( "stat -c %U", desired["path"] ) }
+      },
+
+      "group" => {
+        "read" => lambda { execute( "stat -c %G", desired["path"] ) }
+      },
+
+      "content" => {
+        "read" => lambda { execute( "cat", desired["path"] ) }
+      },
+
+      "checksum" => {
+        "read" => lambda { execute( "md5sum", desired["path"] ).sub(/\s.*/m, "") }
+      }
+
+    } }
+  }
+})
+
+p system["path"]
+p system["checksum"]
+exit
+
 
 # TODO For "check", return if it matches desired
 
 # TODO For "survey", return what was on disk (for specified attrs)
-
-system = Poppet::Implementor::Reader.new(
-  [ "attribute", "path", {
-    "read" => lambda { desired["path"] }
-  } ],
-  [ "attribute", "exists", {
-    "read" => lambda { execute_test( "test", "-e", desired["path"] ) },
-
-    ["within", [ "literal", true ] ] => [
-
-      [ "attribute", "mode", {
-        "read" => lambda { execute( "stat -c %a", desired["path"] ) }
-      } ],
-
-      [ "attribute", "owner", {
-        "read" => lambda { execute( "stat -c %U", desired["path"] ) }
-      } ],
-
-      [ "attribute", "group", {
-        "read" => lambda { execute( "stat -c %G", desired["path"] ) }
-      } ],
-
-      [ "attribute", "content", {
-        "read" => lambda { execute( "cat", desired["path"] ) }
-      } ],
-
-      [ "attribute", "checksum", {
-        "read" => lambda { execute( "md5sum", desired["path"] ) }
-      } ]
-
-    ]
-  } ]
-)
-
-p system
-p system
-exit
 
 def write_file( path, content )
   #TODO: sudo

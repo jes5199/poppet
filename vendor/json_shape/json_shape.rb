@@ -154,9 +154,6 @@ module JsonShape
         raise "Invalid definition #{kind.inspect}"
       end
     end
-  rescue
-    puts [object, kind].inspect
-    raise
   end
 end
 
