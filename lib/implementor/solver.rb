@@ -65,7 +65,8 @@ module Poppet
       state
     end
 
-    def solve( starting_state, max_depth = 10 )
+    def solve( starting_state, max_depth = 10, path = [] )
+      return [path, starting_state] if ! find_difference( starting_state, @desired )
       # breadth-first search: simulate all possible writes
       choices = [ [ [], starting_state ] ]
       max_depth.times do
