@@ -1,4 +1,5 @@
 # Ideas
+## Done
 1. OK Run with cron
 2. OK Collect "facts" (System resource)
 3. OK (External node classification?)
@@ -8,17 +9,21 @@
 7. OK Walk the graph
 8. OK Apply resources
 9. OK Provider: do something. a graph of states? Solve constraints?
-10. TODO Generate report: original system state, actions performed, new system state.
-11. STARTED use GPG
-12. TODO Intelligent graph-walking
-12. TODO Some sort of configuration file
-13. TODO Command line parsing
-14. TODO System facts from existing fact whatsits.
-15. TODO Nicer json-shape error messages
-16. OK Command-line save to inventory
-17. TODO Nicer DSL for defining implementors
-18. TODO Directory imp
-*. TODO various other TODOs scattered around the source.
+10. OK Command-line save to inventory
+11. OK Directory imp
+
+## Sciency
+1. TODO Generate report: original system state, actions performed, new system state.
+2. STARTED use GPG
+3. TODO Intelligent graph-walking
+4. TODO Nicer DSL for defining implementors
+
+## Tedium
+1. TODO Some sort of configuration file
+2. TODO Command line parsing
+3. TODO System facts from existing fact whatsits.
+4. TODO Nicer json-shape error messages
+5. TODO various other TODOs scattered around the source.
 
 # Instructions
 ## Client/Server
