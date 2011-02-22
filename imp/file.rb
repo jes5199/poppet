@@ -46,7 +46,7 @@ reader = Poppet::Implementor::Reader.new({
 
   "content" => [
     { "exists" => [ "literal", true ] },
-    lambda { execute( "cat", desired["path"] ) }
+    lambda { p desired; execute( "cat", desired["path"] ) }
   ],
 
   "checksum" => [
@@ -56,15 +56,17 @@ reader = Poppet::Implementor::Reader.new({
 })
 
 checker = Poppet::Implementor::Checker.new({
-  "path"     => lambda{ |actual, desired| actual == desired },
-  "exists"   => lambda{ |actual, desired| actual == desired },
-  "content"  => lambda{ |actual, desired| actual == desired },
-  "mode"     => lambda do |actual, desired|
-                 simulated_chmod( actual["mode"], desired["mode"] ) == actual["mode"]
+  "path"     => lambda{ |actual_value, desired_value| actual_value == desired_value },
+  "exists"   => lambda{ |actual_value, desired_value| actual_value == desired_value },
+  "content"  => lambda{ |actual_value, desired_value| actual_value == desired_value },
+  "checksum" => lambda{ |actual_value, desired_value| actual_value == desired_value },
+
+  "owner"    => lambda{ |actual_value, desired_value| numeric_user(  desired_value["owner"] ) == numeric_user(  actual_value["owner"] ) },
+  "group"    => lambda{ |actual_value, desired_value| numeric_group( desired_value["owner"] ) == numeric_group( actual_value["owner"] ) },
+
+  "mode"     => lambda do |actual_value, desired_value|
+                 simulated_chmod( actual_value["mode"], desired_value["mode"] ) == actual_value["mode"]
                 end,
-  "owner"    => lambda{ |actual, desired| numeric_user(  desired["owner"] ) == numeric_user(  actual["owner"] ) },
-  "group"    => lambda{ |actual, desired| numeric_group( desired["owner"] ) == numeric_group( actual["owner"] ) },
-  "checksum" => lambda{ |actual, desired| actual == desired },
 })
 
 def write_file( w, desired )

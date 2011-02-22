@@ -50,11 +50,10 @@ module Poppet
       # breadth-first search: simulate all possible writes
       choices = [ [ @reader, [] ] ]
       max_depth.times do
-        p choices
-        choices = choices.map do |actual, history|
+        choices = choices.map do |state, history|
           @writer.rules.map do |rule|
             path = history + [rule]
-            results = @writer.simulate( rule, actual, @desired )
+            results = @writer.simulate( rule, state, @desired )
             unless results.nil?
               return path if ! find_difference( results, @desired )
               [

@@ -11,7 +11,10 @@ module Poppet
       return @known[name] if @known[name]
 
       rules = @rules[name]
-      do_rules(self, rules)
+      r = do_rules(self, rules)
+      unless r.nil?
+        @known[name] = r
+      end
     end
   end
 end
