@@ -5,10 +5,12 @@ module Poppet
   class Implementor::Implementation
     private
     def do_rules( res, rules, *args )
-      r = nil
+      r = res
       Array(rules).each do |rule|
         if rule.is_a?(Hash)
-          r = ( JsonShape.schema_check( res, ["object", {"members" => rule, "allow_extra" => true}] ) || true rescue false )
+          rule.each do |key, rule_part|
+            r = r && ( JsonShape.schema_check( r[key], rule_part ) || r rescue nil )
+          end
         elsif rule.respond_to? :call
           r = rule.call( *args )
         else

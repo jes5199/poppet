@@ -2,6 +2,7 @@ require 'lib/implementor/implementation'
 
 module Poppet
   class Implementor::Writer < Implementor::Implementation
+    attr_reader :rules
     def initialize(rules)
       @rules = rules
       @known = {}

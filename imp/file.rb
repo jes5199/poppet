@@ -16,7 +16,8 @@ if ! desired["path"]
 end
 
 def execute_test(*args)
-  false # FIXME
+  `#{args.join(" ")}` # FIXME
+  $? == 0
 end
 def execute(*args)
   `#{args.join(" ")}` # FIXME
@@ -26,7 +27,7 @@ end
 reader = Poppet::Implementor::Reader.new({
   "path" => lambda { desired["path"] },
 
-  "exists" => lambda { execute_test( "test", "-e", desired["path"] ) },
+  "exists" => lambda { execute_test( "test", "-e", desired["path"] ) ; },
 
   "mode"   => [
     { "exists" => [ "literal", true ] },
@@ -66,11 +67,10 @@ checker = Poppet::Implementor::Checker.new({
   "checksum" => lambda{ |actual, desired| actual == desired },
 })
 
-def write_file( w, path, content )
+def write_file( w, desired )
   #TODO: sudo
   #TODO: umode
-  w.execute( "echo", content, :output => path )
-  set( "content", content )
+  w.execute( "echo", desired["content"], :output => desired["path"] )
 end
 
 writer = Poppet::Implementor::Writer.new([ # state machine
@@ -104,7 +104,7 @@ writer = Poppet::Implementor::Writer.new([ # state machine
   [
     { "exists" => ["literal", true], "content" => "string" },
     lambda do |w, actual, desired|
-      write_file( w, "echo", desired )
+      write_file( w, desired )
       actual.merge( "content" => desired["content"] )
     end
   ],
@@ -135,4 +135,5 @@ writer = Poppet::Implementor::Writer.new([ # state machine
   ]
 ])
 
-Poppet::Implementor::Solver.new( reader, desired, checker, writer ).do( command )
+require 'pp'
+pp Poppet::Implementor::Solver.new( reader, desired, checker, writer ).do( command )

@@ -17,10 +17,16 @@ module Poppet
     end
 
     def check
-      @desired.keys.each do |key|
-        raise "#{key} doesn't match" unless @checker.check(key, @reader, @desired)
-      end
+      diff = find_differences( @reader, @desired )
+      raise diff if diff
       return true
+    end
+
+    def find_difference( state, des )
+      des.keys.each do |key|
+        return "#{key} is #{state[key]}, doesn't match #{des[key]}" unless @checker.check(key, state, des)
+      end
+      return nil
     end
 
     def survey
@@ -32,29 +38,33 @@ module Poppet
     end
 
     def simulate
-      solve(:simulate)
+      solve
     end
 
     def change
-      solve(:change)
+      solve
+      # TODO apply changes.
     end
 
-    def solve( write_mode, max_depth = 10 )
-      raise "unsolvable?" if max_depth <= 0
-      max_depth = n
+    def solve( max_depth = 10 )
       # breadth-first search: simulate all possible writes
-      choices = [ [ actual, [] ] ]
+      choices = [ [ @reader, [] ] ]
       max_depth.times do
-        @writer.rules.map do |state, rule, history|
-          results = writer.simulate( rule, actual, desired )
-          unless results.nil?
-            [
-              results, ( history + [rule] )
-            ]
-          end
-        end.compact
+        p choices
+        choices = choices.map do |actual, history|
+          @writer.rules.map do |rule|
+            path = history + [rule]
+            results = @writer.simulate( rule, actual, @desired )
+            unless results.nil?
+              return path if ! find_difference( results, @desired )
+              [
+                results, ( history + [rule] )
+              ]
+            end
+          end.compact
+        end.inject([]){|a,b| a+b}
       end
-
+      raise "no solution found."
     end
   end
 end
