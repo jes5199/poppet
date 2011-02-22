@@ -19,11 +19,12 @@
 4. TODO Nicer DSL for defining implementors
 
 ## Tedium
-1. TODO Some sort of configuration file
-2. TODO Command line parsing
-3. TODO System facts from existing fact whatsits.
-4. TODO Nicer json-shape error messages
-5. TODO various other TODOs scattered around the source.
+1. TODO Don't recreate existing policy files
+2. TODO Some sort of configuration file
+3. TODO Command line parsing
+4. TODO System facts from existing fact whatsits.
+5. TODO Nicer json-shape error messages
+6. TODO various other TODOs scattered around the source.
 
 # Instructions
 ## Client/Server
