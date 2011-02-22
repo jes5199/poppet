@@ -46,6 +46,69 @@ module JsonShape
     end
   end
 
+  class Failure < ArgumentError
+    def initialize( object, kind, path )
+      @object, @kind, @path = object, kind, path
+    end
+
+    def to_s
+      "#{ @object.inspect } found when expecting #{ @kind.inspect }, at #{ path.inspect }"
+    end
+
+    def raise
+      raise self
+    end
+  end
+
+  def self.schema_problem( object, kind, schema = {}, path = [] )
+    kind = Kind.new(kind)
+
+    case kind
+
+    # simple values
+    when IsDefinition["string"]
+      return Failure.new( object, kind, path ) unless object.is_a? String
+    when IsDefinition["number"]
+      return Failure.new( object, kind, path ) unless object.is_a? Numeric
+    when IsDefinition["boolean"]
+      return Failure.new( object, kind, path ) unless object == true || object == false
+    when IsDefinition["null"]
+      return Failure.new( object, kind, path ) unless object == nil
+    when IsDefinition["undefined"]
+      object == :undefined or return Failure.new( object, kind, path )
+
+    # complex values
+    when IsDefinition["array"]
+      return Failure.new( object, kind, path ) unless object.is_a? Array
+      object.each_with_index do |entry, index|
+        if kind.contents?
+          problem = schema_problem( entry, kind.contents, schema, path + [index] )
+          return problem if problem
+        end
+      end
+
+    when IsDefinition["object"]
+      object.is_a?(Hash) or return Failure.new( object, kind, path )
+      if kind.members?
+        kind.members.each do |name, spec|
+          val = object.has_key?(name) ? object[name] : :undefined
+          next if val == :undefined and kind.allow_missing
+          problem = schema_problem( val, spec, schema )
+          return problem if problem
+        end
+        if kind.allow_extra != true
+          extras = object.keys - kind.members.keys
+          raise "#{extras.inspect} are not valid members" if extras != []
+        end
+      end
+
+
+
+    else
+      return nil
+    end
+  end
+
   def self.schema_check( object, kind, schema = {})
     kind = Kind.new(kind)
 

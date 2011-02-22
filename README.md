@@ -25,6 +25,7 @@
 4. TODO System facts from existing fact whatsits.
 5. TODO Nicer json-shape error messages
 6. TODO various other TODOs scattered around the source.
+7. TODO Too much magic in Implementor::Reader
 
 # Instructions
 ## Client/Server
