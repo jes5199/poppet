@@ -24,6 +24,5 @@
 3. cron announce.rb # uploads system information into inventory
 4. cron client.rb   # downloads and applies policy
 
-# Instructions
 ## Standalone
 1. ruby system_facts.rb  | ruby make_policy.rb  | ruby apply.rb
