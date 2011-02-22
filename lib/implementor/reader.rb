@@ -16,5 +16,10 @@ module Poppet
         @known[name] = r
       end
     end
+
+    def merge( hash )
+      Hash.new{|h,k| h[k] = self[k]}.merge( @known ).merge(hash)
+    end
+
   end
 end
