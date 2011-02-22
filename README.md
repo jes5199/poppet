@@ -18,7 +18,12 @@
 16. TODO Command-line save to inventory
 
 # Instructions
+## Client/Server
 1. run server.rb on your server # rack app, supplies upload/download access through HTTP
 2. cron coordinator.rb on your server # calculates policies for inventory
 3. cron announce.rb # uploads system information into inventory
 4. cron client.rb   # downloads and applies policy
+
+# Instructions
+## Standalone
+1. ruby system_facts.rb  | ruby make_policy.rb  | ruby apply.rb
