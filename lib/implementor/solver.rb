@@ -65,13 +65,12 @@ module Poppet
       state
     end
 
-    def solve( starting_state, max_depth = 10, path = [] )
-      return [path, starting_state] if ! find_difference( starting_state, @desired )
+    def solve( starting_state, max_depth = 10 )
       # breadth-first search: simulate all possible writes
       choices = [ [ [], starting_state ] ]
       max_depth.times do
         choices = choices.map do |history, state|
-          @writer.rules.map do |rule|
+          ( [[]] + @writer.rules ).map do |rule|
             path = history + [rule]
             result = @writer.simulate( rule, state, @desired )
             unless result.nil?
