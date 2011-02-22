@@ -55,17 +55,21 @@ reader = Poppet::Implementor::Reader.new({
   ]
 })
 
+def simulated_chmod( old, new)
+  new #FIXME
+end
+
 checker = Poppet::Implementor::Checker.new({
   "path"     => lambda{ |actual_value, desired_value| actual_value == desired_value },
   "exists"   => lambda{ |actual_value, desired_value| actual_value == desired_value },
   "content"  => lambda{ |actual_value, desired_value| actual_value == desired_value },
   "checksum" => lambda{ |actual_value, desired_value| actual_value == desired_value },
 
-  "owner"    => lambda{ |actual_value, desired_value| numeric_user(  desired_value["owner"] ) == numeric_user(  actual_value["owner"] ) },
-  "group"    => lambda{ |actual_value, desired_value| numeric_group( desired_value["owner"] ) == numeric_group( actual_value["owner"] ) },
+  "owner"    => lambda{ |actual_value, desired_value| numeric_user(  desired_value ) == numeric_user(  actual_value ) },
+  "group"    => lambda{ |actual_value, desired_value| numeric_group( desired_value ) == numeric_group( actual_value ) },
 
   "mode"     => lambda do |actual_value, desired_value|
-                 simulated_chmod( actual_value["mode"], desired_value["mode"] ) == actual_value["mode"]
+                 simulated_chmod( actual_value, desired_value ) == actual_value
                 end,
 })
 

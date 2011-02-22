@@ -53,11 +53,11 @@ module Poppet
         choices = choices.map do |state, history|
           @writer.rules.map do |rule|
             path = history + [rule]
-            results = @writer.simulate( rule, state, @desired )
-            unless results.nil?
-              return path if ! find_difference( results, @desired )
+            result = @writer.simulate( rule, state, @desired )
+            unless result.nil?
+              return [path, result] if ! find_difference( result, @desired )
               [
-                results, ( history + [rule] )
+                result, ( history + [rule] )
               ]
             end
           end.compact
