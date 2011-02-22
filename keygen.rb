@@ -16,7 +16,7 @@ private_key = "keys/#{key_name}.sec"
 
 raise "stop!" if File.exist?(pubkey) or File.exist?(private_key)
 
-name = ARGV[0] #FIXME
+name = ARGV[0] #TODO: argument parsing
 
 File.open(batch_file, "w") do |f|
   f.puts <<-BATCH

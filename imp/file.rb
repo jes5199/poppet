@@ -50,7 +50,7 @@ reader = Poppet::Implementor::Reader.new({
 })
 
 def simulated_chmod( old, new)
-  new #FIXME
+  new #TODO: smart chmods
 end
 
 checker = Poppet::Implementor::Checker.new({
@@ -135,3 +135,4 @@ writer = Poppet::Implementor::Writer.new([ # state machine
 
 require 'pp'
 pp Poppet::Implementor::Solver.new( reader, desired, checker, writer ).do( command )
+# TODO: print out json
