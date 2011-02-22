@@ -1,4 +1,6 @@
 require 'lib/struct'
+require 'lib/resource'
+
 module Poppet
   class Policy < Struct
     attr_reader :data
@@ -15,10 +17,10 @@ module Poppet
     def self.schema
       Struct.schema_for(
         "policy", "0",
-        {
+        ["object", {
           "resources" => ["dictionary", {"contents" => "resource"} ],
           "name"      => "string",
-        },
+        }],
         "undefined"
       )
     end

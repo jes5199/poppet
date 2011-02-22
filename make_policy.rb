@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'json'
 require 'lib/policy'
-require 'lib/policy_maker'
+require 'lib/policy/maker'
 require 'lib/storage'
 
 settings = {
@@ -13,7 +13,8 @@ settings = {
 inventory = JSON.parse( ARGV[0] ? File.read(ARGV[0]) : STDIN.read )
 #TODO validate schema
 
-name = Poppet::Struct.by_keys( inventory, settings[:name_by] )
+name_by = ["data"] + settings[:name_by]
+name = Poppet::Struct.by_keys( inventory, name_by )
 policy = Poppet::Policy.new( {}, name )
 Poppet::Policy::Maker.each(settings[:policy_makers]) do |policy_maker|
   policy = policy.combine( policy_maker.execute( inventory ) )

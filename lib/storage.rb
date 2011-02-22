@@ -52,6 +52,8 @@ module Poppet
         data = JSON.parse( File.read( input_filename ) )
         name = Poppet::Struct.by_keys(data, struct_keys)
 
+        raise "name not found" unless name && name != ""
+
         output_filename = File.join( target_dir, name )
 
         if File.symlink?(output_filename)

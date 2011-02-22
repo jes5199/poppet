@@ -22,7 +22,7 @@ print <<-JSON
           "content": "Hello, world"
         }
       }
-    },
+    }
   }
 }
 JSON
