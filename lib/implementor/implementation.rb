@@ -11,7 +11,11 @@ module Poppet
           rule.each do |key, rule_part|
             if ! r.nil?
               val = r[key]
-              r = ( JsonShape.schema_check( val, rule_part ) || r rescue nil )
+              begin
+                JsonShape.schema_check( val, rule_part )
+              rescue => e
+                r = nil
+              end
             end
           end
         elsif rule.respond_to? :call

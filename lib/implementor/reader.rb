@@ -17,8 +17,12 @@ module Poppet
       end
     end
 
+    def to_hash
+      Hash.new{|h,k| h[k] = self[k]}.merge( @known )
+    end
+
     def merge( hash )
-      Hash.new{|h,k| h[k] = self[k]}.merge( @known ).merge(hash)
+      to_hash.merge(hash)
     end
 
   end

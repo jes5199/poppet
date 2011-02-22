@@ -20,8 +20,12 @@ module JsonShape
     attr :params
 
     def initialize(kind)
-      @name, @params = kind
-      @params ||= {}
+      if kind.is_a?(Array)
+        @name, @params = kind
+      else
+        @name = kind
+        @params = {}
+      end
     end
 
     def inspect

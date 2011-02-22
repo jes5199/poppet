@@ -1,3 +1,5 @@
+#!/usr/bin/ruby
+
 require 'rubygems'
 require 'json'
 
@@ -70,7 +72,7 @@ checker = Poppet::Implementor::Checker.new({
 def write_file( w, desired )
   #TODO: sudo
   #TODO: umode
-  w.execute( "echo #{ e desired["content"] } > #{ e desired["path"] } " )
+  w.execute( "echo -n #{ e desired["content"] } > #{ e desired["path"] } " )
 end
 
 writer = Poppet::Implementor::Writer.new([ # state machine

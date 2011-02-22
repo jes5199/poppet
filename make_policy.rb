@@ -10,7 +10,7 @@ settings = {
 }
 
 #TODO validate command line
-inventory = JSON.parse( ARGV[0] ? File.read(ARGV[0]) : STDIN.read )
+inventory = JSON.parse( ARGV[0] ? File.read(ARGV[0]) : STDIN.read ) # TODO factor out this pattern
 #TODO validate schema
 
 name_by = ["data"] + settings[:name_by]

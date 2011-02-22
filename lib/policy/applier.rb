@@ -1,9 +1,13 @@
 require 'lib/policy'
 module Poppet
-  class Policy::Applier < Policy
+  class Policy::Applier
+    def initialize( *args )
+      @policy = Poppet::Policy.new( *args )
+    end
+
     def each
       # TODO: frontier walking
-      resources.each do |id, resource|
+      @policy.resources.each do |id, resource|
         yield(resource)
       end
     end

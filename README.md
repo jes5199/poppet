@@ -15,8 +15,9 @@
 13. TODO Command line parsing
 14. TODO System facts from existing fact whatsits.
 15. TODO Nicer json-shape error messages
+16. TODO Command-line save to inventory
 
-# Instructions (might not all be working currently)
+# Instructions
 1. run server.rb on your server # rack app, supplies upload/download access through HTTP
 2. cron coordinator.rb on your server # calculates policies for inventory
 3. cron announce.rb # uploads system information into inventory

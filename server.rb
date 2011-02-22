@@ -8,8 +8,7 @@ settings = {
   :inventory => 'public/inventory',
 }
 
-
-set :public, "./public"
+set :public, settings[:public]
 
 post '/inventory' do
   # save System to inventory
