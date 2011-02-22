@@ -30,5 +30,31 @@ module Poppet
       end
       puts JSON.dump(res.data)
     end
+
+    def simulate
+      solve(:simulate)
+    end
+
+    def change
+      solve(:change)
+    end
+
+    def solve( write_mode, max_depth = 10 )
+      raise "unsolvable?" if max_depth <= 0
+      max_depth = n
+      # breadth-first search: simulate all possible writes
+      choices = [ [ actual, [] ] ]
+      max_depth.times do
+        @writer.rules.map do |state, rule, history|
+          results = writer.simulate( rule, actual, desired )
+          unless results.nil?
+            [
+              results, ( history + [rule] )
+            ]
+          end
+        end.compact
+      end
+
+    end
   end
 end

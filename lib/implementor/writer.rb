@@ -7,14 +7,12 @@ module Poppet
       @known = {}
     end
 
-    def simulate(name, actual, desired)
-      rules = @rules[name]
-      do_rules(actual, rules, Simulate.new, actual, desired)
+    def simulate(rule, actual, desired)
+      do_rules(actual, rule, Simulate.new, actual, desired)
     end
 
-    def change(name, actual, desired)
-      rules = @rules[name]
-      do_rules(actual, rules, Really.new, actual, desired)
+    def change(rule, actual, desired)
+      do_rules(actual, rule, Really.new, actual, desired)
     end
 
     class Action
