@@ -22,8 +22,8 @@ module Poppet
       end
 
       def execute( *command )
-        puts command.inspect
         really do
+          puts command.inspect
           #TODO: actually execute the command
         end
       end

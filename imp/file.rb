@@ -46,7 +46,7 @@ reader = Poppet::Implementor::Reader.new({
 
   "content" => [
     { "exists" => [ "literal", true ] },
-    lambda { p desired; execute( "cat", desired["path"] ) }
+    lambda { execute( "cat", desired["path"] ) }
   ],
 
   "checksum" => [
