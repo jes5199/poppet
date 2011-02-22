@@ -47,18 +47,27 @@ module Poppet
 
     def simulate
       survey
-      changes, res = solve
+      changes, res = solve( @reader )
       [ changes, new_resource(res) ]
     end
 
     def change
-      simulate
-      # TODO apply changes.
+      changes, simulated_resource = simulate
+      real_resulting_resource = replay( changes, @reader )
+      [ changes, real_resulting_resource ]
     end
 
-    def solve( max_depth = 10 )
+    def replay( changes, resource )
+      state = resource
+      changes.each do |rule|
+        state = @writer.change( rule, state, @desired )
+      end
+      state
+    end
+
+    def solve( starting_state, max_depth = 10 )
       # breadth-first search: simulate all possible writes
-      choices = [ [ [], @reader ] ]
+      choices = [ [ [], starting_state ] ]
       max_depth.times do
         choices = choices.map do |history, state|
           @writer.rules.map do |rule|

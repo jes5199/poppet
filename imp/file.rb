@@ -7,6 +7,8 @@ require 'lib/implementor/checker'
 require 'lib/implementor/writer'
 require 'lib/implementor/solver'
 
+include Poppet::Execute::EscapeWithLittleE
+
 command, desired_json = JSON.parse( STDIN.read )
 desired = Poppet::Resource.new( desired_json )
 
@@ -15,43 +17,35 @@ if ! desired["path"]
   raise "Sorry, I don't support finding a file without a path."
 end
 
-def execute_test(*args)
-  `#{args.join(" ")}` # FIXME
-  $? == 0
-end
-def execute(*args)
-  `#{args.join(" ")}` # FIXME
-end
-
 # Find the file
 reader = Poppet::Implementor::Reader.new({
   "path" => lambda { desired["path"] },
 
-  "exists" => lambda { execute_test( "test", "-e", desired["path"] ) ; },
+  "exists" => lambda { Poppet::Execute.execute_test( "test -e #{ e desired["path"] } " ) },
 
   "mode"   => [
     { "exists" => [ "literal", true ] },
-    lambda { execute( "stat -c %a", desired["path"] ).chomp }
+    lambda { Poppet::Execute.execute( "stat -c %a #{ e desired["path"] }" ).chomp }
   ],
 
   "owner" => [
     { "exists" => [ "literal", true ] },
-    lambda { execute( "stat -c %U", desired["path"] ).chomp }
+    lambda { Poppet::Execute.execute( "stat -c %U #{ e desired["path"] }" ).chomp }
   ],
 
   "group" => [
     { "exists" => [ "literal", true ] },
-    lambda { execute( "stat -c %G", desired["path"] ).chomp }
+    lambda { Poppet::Execute.execute( "stat -c %G #{ e desired["path"] }" ).chomp }
   ],
 
   "content" => [
     { "exists" => [ "literal", true ] },
-    lambda { execute( "cat", desired["path"] ) }
+    lambda { Poppet::Execute.execute( "cat #{ e desired["path"] }" ) }
   ],
 
   "checksum" => [
     { "exists" => [ "literal", true ] },
-    lambda { execute( "md5sum", desired["path"] ).sub(/\s.*/m, "") }
+    lambda { Poppet::Execute.execute( "md5sum #{ e desired["path"] }" ).sub(/\s.*/m, "") }
   ]
 })
 
@@ -76,16 +70,14 @@ checker = Poppet::Implementor::Checker.new({
 def write_file( w, desired )
   #TODO: sudo
   #TODO: umode
-  w.execute( "echo", desired["content"], :output => desired["path"] )
+  w.execute( "echo #{ e desired["content"] } > #{ e desired["path"] } " )
 end
 
 writer = Poppet::Implementor::Writer.new([ # state machine
   [
     {"exists" => ["literal", true]},
     lambda do |w, actual, desired|
-      w.really do
-        execute( "rm", desired["path"] ) # in traditional unix style, let's remove files and symlinks but not directories.
-      end
+      w.execute( "rm #{ e desired["path"] }" ) # in traditional unix style, let's remove files and symlinks but not directories.
       {
         "path" => desired["path"],
         "exists" => false
@@ -119,7 +111,7 @@ writer = Poppet::Implementor::Writer.new([ # state machine
     { "exists" => ["literal", true], "mode" => "string" },
     lambda do |w, actual, desired|
       mod = simulated_chmod( actual["mode"], desired["mode"] )
-      w.execute( "chmod", desired["mode"], desired["path"] )
+      w.execute( "chmod #{e desired["mode"] } #{ e desired["path"] }" )
       actual.merge( "mode" => mod )
     end
   ],
@@ -127,7 +119,7 @@ writer = Poppet::Implementor::Writer.new([ # state machine
   [
     { "exists" => ["literal", true], "owner" => "string" },
     lambda do |w, actual, desired|
-      w.execute( "chown", desired["owner"], desired["path"] )
+      w.execute( "chown #{e desired["owner"] }, #{e desired["path"] } " )
       actual.merge( "owner" => desired["owner"] )
     end
   ],
@@ -135,7 +127,7 @@ writer = Poppet::Implementor::Writer.new([ # state machine
   [
     { "exists" => ["literal", true], "group" => "string" },
     lambda do |w, actual, desired|
-      w.execute( "chown", desired["group"], desired["path"] )
+      w.execute( "chown #{e desired["group"]} #{e desired["path"]} " )
       actual.merge( "group" => desired["group"] )
     end
   ]

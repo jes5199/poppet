@@ -1,4 +1,5 @@
 require 'lib/implementor/implementation'
+require 'lib/execute'
 
 module Poppet
   class Implementor::Writer < Implementor::Implementation
@@ -21,10 +22,9 @@ module Poppet
         raise "virtual"
       end
 
-      def execute( *command )
+      def execute( command )
         really do
-          puts command.inspect
-          #TODO: actually execute the command
+          Poppet::Execute.execute( command )
         end
       end
     end
