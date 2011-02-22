@@ -10,6 +10,7 @@ print <<-JSON
         "version": "0",
         "type": "directory",
         "data": {
+          "exists": true,
           "path": "/tmp/poppet"
         }
       },

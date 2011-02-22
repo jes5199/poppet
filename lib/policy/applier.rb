@@ -7,7 +7,8 @@ module Poppet
 
     def each
       # TODO: frontier walking
-      @policy.resources.each do |id, resource|
+      @policy.resources.to_a.shuffle.each do |id, resource|
+        STDERR.puts id
         yield(resource)
       end
     end

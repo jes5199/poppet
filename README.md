@@ -15,7 +15,10 @@
 13. TODO Command line parsing
 14. TODO System facts from existing fact whatsits.
 15. TODO Nicer json-shape error messages
-16. TODO Command-line save to inventory
+16. OK Command-line save to inventory
+17. TODO Nicer DSL for defining implementors
+18. TODO Directory imp
+*. TODO various other TODOs scattered around the source.
 
 # Instructions
 ## Client/Server

@@ -14,16 +14,15 @@ include Poppet::Execute::EscapeWithLittleE
 command, desired_json = JSON.parse( STDIN.read )
 desired = Poppet::Resource.new( desired_json )
 
-# Question: should we support finding files by things other than path?
 if ! desired["path"]
-  raise "Sorry, I don't support finding a file without a path."
+  raise "Sorry, I don't support finding a directory without a path."
 end
 
 # Find the file
 reader = Poppet::Implementor::Reader.new({
   "path" => lambda { desired["path"] },
 
-  "exists" => lambda { Poppet::Execute.execute_test( "test -e #{ e desired["path"] } " ) },
+  "exists" => lambda { Poppet::Execute.execute_test( "test -d #{ e desired["path"] } " ) },
 
   "mode"   => [
     { "exists" => [ "literal", true ] },
@@ -39,16 +38,6 @@ reader = Poppet::Implementor::Reader.new({
     { "exists" => [ "literal", true ] },
     lambda { Poppet::Execute.execute( "stat -c %G #{ e desired["path"] }" ).chomp }
   ],
-
-  "content" => [
-    { "exists" => [ "literal", true ] },
-    lambda { Poppet::Execute.execute( "cat #{ e desired["path"] }" ) }
-  ],
-
-  "checksum" => [
-    { "exists" => [ "literal", true ] },
-    lambda { Poppet::Execute.execute( "md5sum #{ e desired["path"] }" ).sub(/\s.*/m, "") }
-  ]
 })
 
 # TODO extract these to lib
@@ -64,11 +53,10 @@ def numeric_group( grp )
   Poppet::Execute.execute( "getent group #{e grp} | cut -d: -f3" ) # surprisingly ugly!
 end
 
+
 checker = Poppet::Implementor::Checker.new({
   "path"     => lambda{ |actual_value, desired_value| actual_value == desired_value },
   "exists"   => lambda{ |actual_value, desired_value| actual_value == desired_value },
-  "content"  => lambda{ |actual_value, desired_value| actual_value == desired_value },
-  "checksum" => lambda{ |actual_value, desired_value| actual_value == desired_value },
 
   "owner"    => lambda{ |actual_value, desired_value| numeric_user(  desired_value ) == numeric_user(  actual_value ) },
   "group"    => lambda{ |actual_value, desired_value| numeric_group( desired_value ) == numeric_group( actual_value ) },
@@ -78,10 +66,10 @@ checker = Poppet::Implementor::Checker.new({
                 end,
 })
 
-def write_file( w, desired )
+def mkdir( w, desired )
   #TODO: sudo
   #TODO: umode
-  w.execute( "echo -n #{ e desired["content"] } > #{ e desired["path"] } " )
+  w.execute( "mkdir -p #{ e desired["path"] }" )
 end
 
 writer = Poppet::Implementor::Writer.new([ # state machine
@@ -99,22 +87,13 @@ writer = Poppet::Implementor::Writer.new([ # state machine
   [
     {"exists" => ["literal", false]},
     lambda do |w, actual, desired|
-      write_file( w, desired )
+      mkdir( w, desired )
       {
         "exists"  => true,
         "path"    => desired["path"],
         "mode"    => desired["mode"],
         "owner"   => desired["owner"],
-        "content" => desired["content"]
       }
-    end
-  ],
-
-  [
-    { "exists" => ["literal", true], "content" => "string" },
-    lambda do |w, actual, desired|
-      write_file( w, desired )
-      actual.merge( "content" => desired["content"] )
     end
   ],
 
