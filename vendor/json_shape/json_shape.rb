@@ -93,13 +93,47 @@ module JsonShape
         kind.members.each do |name, spec|
           val = object.has_key?(name) ? object[name] : :undefined
           next if val == :undefined and kind.allow_missing
-          problem = schema_problem( val, spec, schema )
+          problem = schema_problem( val, spec, schema, path + [name] )
           return problem if problem
         end
         if kind.allow_extra != true
-          extras = object.keys - kind.members.keys
-          raise "#{extras.inspect} are not valid members" if extras != []
+          extra_keys = object.keys - kind.members.keys
+          extra_keys.each do |key|
+            problem = schema_problem( object[key], :undefined, schema, path + [key] ) # Sort of a silly way to do this.
+            return problem if problem
+          end
         end
+      end
+
+    # obvious extensions
+    when IsDefinition["anything"]
+      object != :undefined or return Failure.new( object, kind, path )
+
+    when IsDefinition["literal"]
+      object == kind.params or return Failure.new( object, kind, path )
+
+    when IsDefinition["integer"]
+      problem = schema_problem( object, "number", schema, path )
+      return problem if problem
+      object.is_a?(Integer) or return Failure.new( object, kind, path )
+
+    when IsDefinition["enum"]
+      kind.values!.find_index do |value|
+        value == object
+      end or return Failure.new( object, kind, path )
+
+    when IsDefinition["range"]
+      return Failure.new( object, kind, path ) unless object.is_a? Numeric
+      bottom, top = kind.limits!
+      raise "value out of range" unless (bottom..top).include?(object)
+
+    when IsDefinition["tuple"]
+      problem = schema_problem( object, "array", schema, path )
+      return problem if problem
+      return Failure.new( object, kind, path ) if object.length > kind.elements!.length
+      undefineds = [:undefined] * (kind.elements!.length - object.length)
+      kind.elements!.zip(object + undefineds).each do |spec, value|
+        schema_check( value, spec, schema )
       end
 
 
