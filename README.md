@@ -11,6 +11,7 @@
 9. OK Provider: do something. a graph of states? Solve constraints?
 10. OK Command-line save to inventory
 11. OK Directory imp
+12. OK Nicer json-shape error messages
 
 ## Sciency
 1. TODO Generate report: original system state, actions performed, new system state.
@@ -24,9 +25,8 @@
 2. TODO Some sort of configuration file
 3. TODO Command line parsing
 4. TODO System facts from existing fact whatsits.
-5. TODO Nicer json-shape error messages
-6. TODO various other TODOs scattered around the source.
-7. TODO Too much magic in Implementor::Reader
+5. TODO various other TODOs scattered around the source.
+6. TODO Too much magic in Implementor::Reader
 
 # Instructions
 ## Client/Server
