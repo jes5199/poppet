@@ -59,23 +59,25 @@ module JsonShape
   def self.schema_check( object, kind, schema = {}, path = [])
     kind = Kind.new(kind)
 
+    failure = lambda{|message| raise Failure.new(message, object, kind, path) }
+
     case kind
 
     # simple values
     when IsDefinition["string"]
-      raise "not a string" unless object.is_a? String
+      failure["not a string"] unless object.is_a? String
     when IsDefinition["number"]
-      raise "not a number" unless object.is_a? Numeric
+      failure["not a number"] unless object.is_a? Numeric
     when IsDefinition["boolean"]
-      raise "not a boolean" unless object == true || object == false
+      failure["not a boolean"] unless object == true || object == false
     when IsDefinition["null"]
-      raise "not null" unless object == nil
+      failure["not null"] unless object == nil
     when IsDefinition["undefined"]
-      object == :undefined or raise "#{object.inspect} is defined"
+      object == :undefined or failure["is not undefined"]
 
     # complex values
     when IsDefinition["array"]
-      raise "not an array" unless object.is_a? Array
+      failure[ "not an array" ] unless object.is_a? Array
       object.each_with_index do |entry, i|
         if kind.contents?
           schema_check( entry, kind.contents, schema, path + [i] )
@@ -83,7 +85,7 @@ module JsonShape
       end
 
     when IsDefinition["object"]
-      object.is_a?(Hash) or raise "#{object.inspect} is not an object"
+      object.is_a?(Hash) or failure["not an object"]
       if kind.members?
         kind.members.each do |name, spec|
           val = object.has_key?(name) ? object[name] : :undefined
@@ -92,34 +94,34 @@ module JsonShape
         end
         if kind.allow_extra != true
           extras = object.keys - kind.members.keys
-          raise "#{extras.inspect} are not valid members" if extras != []
+          failure[ "#{extras.inspect} are not valid members" ] if extras != []
         end
       end
 
     # obvious extensions
     when IsDefinition["anything"]
-      object != :undefined or raise "#{object.inspect} is undefined"
+      object != :undefined or failure[ "is not defined" ]
 
     when IsDefinition["literal"]
-      object == kind.params or raise "#{object.inspect} != #{kind.params.inspect}"
+      object == kind.params or failure[ "doesn't match" ]
 
     when IsDefinition["integer"]
       schema_check( object, "number", schema, path)
-      object.is_a?(Integer) or raise "#{object.inspect} is not an integer"
+      object.is_a?(Integer) or failure[ "is not an integer" ]
 
     when IsDefinition["enum"]
       kind.values!.find_index do |value|
         value == object
-      end or raise "does not match any of #{kind.values.inspect}"
+      end or failure["does not match any choice"]
 
     when IsDefinition["range"]
-      raise "not a number" unless object.is_a? Numeric
+      failure["not a number"] unless object.is_a? Numeric
       bottom, top = kind.limits!
-      raise "value out of range" unless (bottom..top).include?(object)
+      failure["value out of range"] unless (bottom..top).include?(object)
 
     when IsDefinition["tuple"]
       schema_check( object, "array", schema, path )
-      raise "tuple is the wrong size" if object.length > kind.elements!.length
+      failure["tuple is the wrong size"] if object.length > kind.elements!.length
       undefineds = [:undefined] * (kind.elements!.length - object.length)
       kind.elements!.zip(object + undefineds).each_with_index do |pair, i|
         spec, value = pair
@@ -143,7 +145,7 @@ module JsonShape
         rescue Failure
           false
         end
-      end or raise "#{object.inspect} does not match any of #{kind.choices.inspect}"
+      end or failure["does not match any choice"]
 
     when IsDefinition["optional"]
       object == :undefined or schema_check( object, kind.params, schema, path )
@@ -161,7 +163,7 @@ module JsonShape
             false
           rescue Failure
             true
-          end or raise "#{object.inspect} violates #{rule.inspect}"
+          end or failure["violates #{rule.inspect}"]
         end
       end
 

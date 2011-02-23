@@ -19,6 +19,7 @@
 4. TODO Nicer DSL for defining implementors
 
 ## Tedium
+0. TODO json-shape files for data types
 1. TODO Don't recreate existing policy files
 2. TODO Some sort of configuration file
 3. TODO Command line parsing
