@@ -48,11 +48,15 @@ module JsonShape
 
   class Failure < ArgumentError
     def initialize( message, object, kind, path )
-      @object, @kind, @path = object, kind, path
+      @message, @object, @kind, @path = message, object, kind, path
     end
 
     def to_s
-      "#{ @message }: #{ @object.inspect } found when expecting #{ @kind.inspect }, at #{ path.inspect }"
+      "#{ @message }: #{ @object.inspect } found when expecting #{ @kind.inspect }, at #{ @path.inspect }"
+    end
+
+    def message
+      to_s
     end
   end
 
