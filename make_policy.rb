@@ -3,6 +3,7 @@ require 'json'
 require 'lib/policy'
 require 'lib/policy/maker'
 require 'lib/storage'
+require 'lib/resource/system'
 
 settings = {
   :policy_makers => "policy_makers/*",
@@ -11,7 +12,7 @@ settings = {
 
 #TODO validate command line
 inventory = JSON.parse( ARGV[0] ? File.read(ARGV[0]) : STDIN.read ) # TODO factor out this pattern
-#TODO validate schema
+Poppet::Resource::System.new( inventory ) # validates the schema
 
 name_by = ["data"] + settings[:name_by]
 name = Poppet::Struct.by_keys( inventory, name_by )

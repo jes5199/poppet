@@ -4,7 +4,6 @@ require 'rubygems'
 require 'json'
 
 policy = JSON.parse( ARGV[0] ? File.read(ARGV[0]) : STDIN.read ) # TODO factor out this pattern
-#TODO validate schema
 
 applier = Poppet::Policy::Applier.new( policy )
 
