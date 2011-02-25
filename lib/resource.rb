@@ -30,6 +30,10 @@ module Poppet
       self.class.new( @data, h )
     end
 
+    def to_json
+      @data.to_json
+    end
+
     def self.empty_data
       {
         "version" => "0",
