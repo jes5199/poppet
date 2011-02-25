@@ -124,5 +124,5 @@ writer = Poppet::Implementor::Writer.new([ # state machine
 ])
 
 require 'pp'
-pp Poppet::Implementor::Solver.new( reader, desired, checker, writer ).do( command )
+pp Poppet::Implementor::Solver.new( desired, reader, checker, writer ).do( command )
 # TODO: print out json

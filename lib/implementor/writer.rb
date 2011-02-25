@@ -10,11 +10,11 @@ module Poppet
     end
 
     def simulate(rule, actual, desired)
-      do_rules(actual.to_hash, rule, Simulate.new, actual, desired)
+      do_rules(actual, rule, Simulate.new, actual, desired)
     end
 
     def change(rule, actual, desired)
-      do_rules(actual.to_hash, rule, Really.new, actual, desired)
+      do_rules(actual, rule, Really.new, actual, desired)
     end
 
     class Action

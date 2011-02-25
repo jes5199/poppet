@@ -23,31 +23,31 @@ end
 reader = Poppet::Implementor::Reader.new({
   "path" => lambda { desired["path"] },
 
-  "exists" => lambda { Poppet::Execute.execute_test( "test -e #{ e desired["path"] } " ) },
+  "exists" => lambda { |r| Poppet::Execute.execute_test( "test -e #{ e r["path"] } " ) },
 
   "mode"   => [
     { "exists" => [ "literal", true ] },
-    lambda { Poppet::Execute.execute( "stat -c %a #{ e desired["path"] }" ).chomp }
+    lambda { |r| Poppet::Execute.execute( "stat -c %a #{ e r["path"] }" ).chomp }
   ],
 
   "owner" => [
     { "exists" => [ "literal", true ] },
-    lambda { Poppet::Execute.execute( "stat -c %U #{ e desired["path"] }" ).chomp }
+    lambda { |r| Poppet::Execute.execute( "stat -c %U #{ e r["path"] }" ).chomp }
   ],
 
   "group" => [
     { "exists" => [ "literal", true ] },
-    lambda { Poppet::Execute.execute( "stat -c %G #{ e desired["path"] }" ).chomp }
+    lambda { |r| Poppet::Execute.execute( "stat -c %G #{ e r["path"] }" ).chomp }
   ],
 
   "content" => [
     { "exists" => [ "literal", true ] },
-    lambda { Poppet::Execute.execute( "cat #{ e desired["path"] }" ) }
+    lambda { |r| Poppet::Execute.execute( "cat #{ e r["path"] }" ) }
   ],
 
   "checksum" => [
     { "exists" => [ "literal", true ] },
-    lambda { Poppet::Execute.execute( "md5sum #{ e desired["path"] }" ).sub(/\s.*/m, "") }
+    lambda { |r| Poppet::Execute.execute( "md5sum #{ e r["path"] }" ).sub(/\s.*/m, "") }
   ]
 })
 
@@ -145,5 +145,5 @@ writer = Poppet::Implementor::Writer.new([ # state machine
 ])
 
 require 'pp'
-pp Poppet::Implementor::Solver.new( reader, desired, checker, writer ).do( command )
+pp Poppet::Implementor::Solver.new( desired, reader, checker, writer ).do( command )
 # TODO: print out json

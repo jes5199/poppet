@@ -3,8 +3,8 @@ require 'lib/implementor/implementation'
 
 module Poppet
   class Implementor::Solver < Implementor::Implementation
-    def initialize( reader, desired, checker, writer )
-      @reader, @desired, @checker, @writer = reader, desired, checker, writer
+    def initialize( desired, reader, checker, writer )
+      @desired, @reader, @checker, @writer = desired, reader, checker, writer
     end
 
     def do( command )
@@ -38,49 +38,48 @@ module Poppet
     end
 
     def survey
-      res = new_resource
-      @desired.keys.each do |key|
-        res[key] = @reader[key]
-      end
-      res
+      res = new_resource( @reader.get( @desired.keys ) )
     end
 
     def simulate
-      survey
-      changes, res = solve( @reader )
-      [ changes, new_resource(res) ]
+      resource = survey
+      solve( resource )
     end
 
     def change
-      changes, simulated_resource = simulate
+      changes = simulate
       real_resulting_resource = replay( changes, @reader )
       [ changes, real_resulting_resource ]
     end
 
     def replay( changes, resource )
       state = resource
-      changes.each do |rule|
-        state = @writer.change( rule, state, @desired )
+      changes.each do |action, result|
+        state = @writer.change( action, state, @desired )
+
+        if @paranoid and diff = find_differences( state, result )
+          raise "something went wrong: #{diff}"
+        end
+
       end
       state
     end
 
     def solve( starting_state, max_depth = 10 )
       # breadth-first search: simulate all possible writes
-      choices = [ [ [], starting_state ] ]
+      choices = [ [ [[], starting_state] ] ]
       max_depth.times do
-        choices = choices.map do |history, state|
-          ( [[]] + @writer.rules ).map do |rule|
-            path = history + [rule]
-            result = @writer.simulate( rule, state, @desired )
-            unless result.nil?
-              return [path, result] if ! find_difference( result, @desired )
-              [
-                ( history + [rule] ), result
-              ]
-            end
+        choices = choices.map do |history|
+          state = history.last.last
+          return history if ! find_difference( state, @desired )
+
+          @writer.rules.map do |rule|
+            new_state = @writer.simulate( rule, state, @desired )
+            new_history = history + [rule, new_state]
+            next new_history unless new_state.nil?
           end.compact
-        end.inject([]){|a,b| a+b}
+
+        end
       end
       raise "no solution found."
     end
