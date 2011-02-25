@@ -72,32 +72,32 @@ def mkdir( w, desired )
   w.execute( "mkdir -p #{ e desired["path"] }" )
 end
 
-writer = Poppet::Implementor::Writer.new([ # state machine
-  [
+writer = Poppet::Implementor::Writer.new({ # state machine
+  "delete" => [
     {"exists" => ["literal", true]},
     lambda do |w, actual, desired|
       w.execute( "rm #{ e desired["path"] }" ) # in traditional unix style, let's remove files and symlinks but not directories.
-      {
+      actual.merge({
         "path" => desired["path"],
         "exists" => false
-      }
+      })
     end
   ],
 
-  [
+  "create" => [
     {"exists" => ["literal", false]},
     lambda do |w, actual, desired|
       mkdir( w, desired )
-      {
+      actual.merge({
         "exists"  => true,
         "path"    => desired["path"],
         "mode"    => desired["mode"],
         "owner"   => desired["owner"],
-      }
+      })
     end
   ],
 
-  [
+  "chmod" => [
     { "exists" => ["literal", true], "mode" => "string" },
     lambda do |w, actual, desired|
       mod = simulated_chmod( actual["mode"], desired["mode"] )
@@ -106,7 +106,7 @@ writer = Poppet::Implementor::Writer.new([ # state machine
     end
   ],
 
-  [
+  "chown" => [
     { "exists" => ["literal", true], "owner" => "string" },
     lambda do |w, actual, desired|
       w.execute( "chown #{e desired["owner"] }, #{e desired["path"] } " )
@@ -114,14 +114,14 @@ writer = Poppet::Implementor::Writer.new([ # state machine
     end
   ],
 
-  [
+  "chgrp" => [
     { "exists" => ["literal", true], "group" => "string" },
     lambda do |w, actual, desired|
       w.execute( "chgrp #{e desired["group"]} #{e desired["path"]} " )
       actual.merge( "group" => desired["group"] )
     end
   ]
-])
+})
 
 require 'pp'
 pp Poppet::Implementor::Solver.new( desired, reader, checker, writer ).do( command )

@@ -84,33 +84,33 @@ def write_file( w, desired )
   w.execute( "echo -n #{ e desired["content"] } > #{ e desired["path"] } " )
 end
 
-writer = Poppet::Implementor::Writer.new([ # state machine
-  [
+writer = Poppet::Implementor::Writer.new({ # state machine
+  "delete" => [
     {"exists" => ["literal", true]},
     lambda do |w, actual, desired|
       w.execute( "rm #{ e desired["path"] }" ) # in traditional unix style, let's remove files and symlinks but not directories.
-      {
+      actual.merge({
         "path" => desired["path"],
         "exists" => false
-      }
+      })
     end
   ],
 
-  [
+  "create" => [
     {"exists" => ["literal", false]},
     lambda do |w, actual, desired|
       write_file( w, desired )
-      {
+      actual.merge({
         "exists"  => true,
         "path"    => desired["path"],
         "mode"    => desired["mode"],
         "owner"   => desired["owner"],
         "content" => desired["content"]
-      }
+      })
     end
   ],
 
-  [
+  "overwrite" => [
     { "exists" => ["literal", true], "content" => "string" },
     lambda do |w, actual, desired|
       write_file( w, desired )
@@ -118,31 +118,34 @@ writer = Poppet::Implementor::Writer.new([ # state machine
     end
   ],
 
-  [
+  "chmod" => [
     { "exists" => ["literal", true], "mode" => "string" },
     lambda do |w, actual, desired|
+      return unless desired["mode"]
       mod = simulated_chmod( actual["mode"], desired["mode"] )
       w.execute( "chmod #{e desired["mode"] } #{ e desired["path"] }" )
       actual.merge( "mode" => mod )
     end
   ],
 
-  [
+  "chown" => [
     { "exists" => ["literal", true], "owner" => "string" },
     lambda do |w, actual, desired|
+      return unless desired["owner"]
       w.execute( "chown #{e desired["owner"] }, #{e desired["path"] } " )
       actual.merge( "owner" => desired["owner"] )
     end
   ],
 
-  [
+  "chgrp" => [
     { "exists" => ["literal", true], "group" => "string" },
     lambda do |w, actual, desired|
+      return unless desired["group"]
       w.execute( "chgrp #{e desired["group"]} #{e desired["path"]} " )
       actual.merge( "group" => desired["group"] )
     end
   ]
-])
+})
 
 require 'pp'
 pp Poppet::Implementor::Solver.new( desired, reader, checker, writer ).do( command )

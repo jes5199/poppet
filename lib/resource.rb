@@ -21,8 +21,13 @@ module Poppet
 
     def initialize( data = {}, pairs = nil )
       @data = self.class.empty_data.merge(data)
-      @data["data"].update( pairs ) if pairs
+      @data["data"] = @data["data"].merge( pairs || {} )
+      @data["meta"] = @data["meta"].merge( {} ) if @data["meta"]
       validate!
+    end
+
+    def merge( h )
+      self.class.new( @data, h )
     end
 
     def self.empty_data

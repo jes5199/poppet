@@ -48,38 +48,39 @@ module Poppet
 
     def change
       changes = simulate
-      real_resulting_resource = replay( changes, @reader )
-      [ changes, real_resulting_resource ]
+      replay( changes )
     end
 
-    def replay( changes, resource )
-      state = resource
-      changes.each do |action, result|
-        state = @writer.change( action, state, @desired )
+    def replay( changes )
+      real_state = changes.first[1]
+      changes.map do |rule_name, simulated_result|
+        if rule_name
+          real_state = @writer.change( @writer.rules[rule_name], real_state, @desired )
+        end
 
-        if @paranoid and diff = find_differences( state, result )
+        if @paranoid and diff = find_differences( real_state, simulated_result )
           raise "something went wrong: #{diff}"
         end
 
+        [rule_name , state]
       end
-      state
     end
 
     def solve( starting_state, max_depth = 10 )
       # breadth-first search: simulate all possible writes
-      choices = [ [ [[], starting_state] ] ]
+      choices = [ [ [nil, starting_state] ] ]
       max_depth.times do
         choices = choices.map do |history|
           state = history.last.last
           return history if ! find_difference( state, @desired )
 
-          @writer.rules.map do |rule|
+          @writer.rules.map do |name, rule|
             new_state = @writer.simulate( rule, state, @desired )
-            new_history = history + [rule, new_state]
+            new_history = history + [[name, new_state]]
             next new_history unless new_state.nil?
           end.compact
 
-        end
+        end.inject([]){|a,b| a + b}
       end
       raise "no solution found."
     end

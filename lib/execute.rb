@@ -42,7 +42,7 @@ module Poppet
 
     module EscapeWithLittleE
       def e( string )
-        Poppet::Execute.shellescape( string )
+        Poppet::Execute.shellescape( string.to_s )
       end
     end
 
