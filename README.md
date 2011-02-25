@@ -27,6 +27,7 @@
 4. TODO System facts from existing fact whatsits.
 5. TODO various other TODOs scattered around the source.
 6. TODO Too much magic in Implementor::Reader
+7. TODO A second System->System filter to happen on the serverside before System->Policy
 
 # Instructions
 ## Client/Server
