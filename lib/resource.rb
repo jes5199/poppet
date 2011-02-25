@@ -8,21 +8,21 @@ module Poppet
     end
 
     def [](name)
-      @data["data"][name]
+      @data["Parameters"][name]
     end
 
     def []=(name, value)
-      @data["data"][name] = value
+      @data["Parameters"][name] = value
     end
 
     def keys
-      @data["data"].keys
+      @data["Parameters"].keys
     end
 
     def initialize( data = {}, pairs = nil )
       @data = self.class.empty_data.merge(data)
-      @data["data"] = @data["data"].merge( pairs || {} )
-      @data["meta"] = @data["meta"].merge( {} ) if @data["meta"]
+      @data["Parameters"] = @data["Parameters"].merge( pairs || {} )
+      @data["Metadata"]   = @data["Metadata"].merge( {} ) if @data["Metadata"]
       validate!
     end
 
@@ -36,9 +36,9 @@ module Poppet
 
     def self.empty_data
       {
-        "version" => "0",
-        "type" => "resource",
-        "data" => {
+        "Version" => "0",
+        "Type" => "resource",
+        "Parameters" => {
         }
       }
     end

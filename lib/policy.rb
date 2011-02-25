@@ -6,7 +6,7 @@ module Poppet
     attr_reader :data
     def initialize( data = {}, name = nil )
       @data = self.class.empty_data.merge(data)
-      @data["data"]["name"] = name if name
+      @data["Parameters"]["name"] = name if name
       validate!
     end
 
@@ -27,29 +27,29 @@ module Poppet
 
     def self.empty_data
       {
-        "version" => "0",
-        "type" => "policy",
-        "data" => {
+        "Version" => "0",
+        "Type" => "policy",
+        "Parameters" => {
           "resources" => {},
           "name"      => "",
         }
       }
     end
     def resources
-      @data["data"]["resources"]
+      @data["Parameters"]["resources"]
     end
 
     def orderings
-      @data["data"]["orderings"]
+      @data["Parameters"]["orderings"]
     end
 
     def name
-      @data["data"]["name"]
+      @data["Parameters"]["name"]
     end
 
     def combine( other )
       Policy.new(
-        "data" => {
+        "Parameters" => {
           "resources"=> combine_resources( self.resources, other.resources ),
           "name"     => self.name || other.name,
         }

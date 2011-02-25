@@ -32,8 +32,8 @@ module Poppet
 
     def new_resource( pairs = {} )
       res = Poppet::Resource.new({
-        "type"    => @desired.data["type"],
-        "version" => @desired.data["version"],
+        "Type"    => @desired.data["Type"],
+        "Version" => @desired.data["Version"],
       }, pairs )
     end
 

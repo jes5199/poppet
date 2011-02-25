@@ -14,7 +14,7 @@ settings = {
 inventory = JSON.parse( ARGV[0] ? File.read(ARGV[0]) : STDIN.read ) # TODO factor out this pattern
 Poppet::Resource::System.new( inventory ) # validates the schema
 
-name_by = ["data"] + settings[:name_by]
+name_by = ["Parameters"] + settings[:name_by]
 name = Poppet::Struct.by_keys( inventory, name_by )
 policy = Poppet::Policy.new( {}, name )
 Poppet::Policy::Maker.each(settings[:policy_makers]) do |policy_maker|

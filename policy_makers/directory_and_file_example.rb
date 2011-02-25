@@ -2,23 +2,22 @@
 
 print <<-JSON
 {
-  "version": "0",
-  "type": "policy",
-  "data": {
+  "Version": "0",
+  "Type": "policy",
+  "Parameters": {
     "resources": {
       "my directory": {
-        "version": "0",
-        "type": "directory",
-        "data": {
+        "Version": "0",
+        "Type": "directory",
+        "Parameters": {
           "exists": true,
           "path": "/tmp/poppet"
         }
       },
       "my file": {
-        "type": "file",
-        "version": "0",
-        "type": "file",
-        "data": {
+        "Version": "0",
+        "Type": "file",
+        "Parameters": {
           "path": "/tmp/poppet/file",
           "content": "Hello, world"
         }

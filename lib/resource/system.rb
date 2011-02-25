@@ -4,9 +4,9 @@ module Poppet
     attr :data
     def initialize( facts )
       @data = {
-        "version" => "0",
-        "type" => "system",
-        "data" => facts,
+        "Version" => "0",
+        "Type" => "system",
+        "Parameters" => facts,
       }
       validate!
     end

@@ -29,10 +29,10 @@ module Poppet
       {
         "struct" => ["object", {
           "members" => {
-            "type"    => "string",
-            "version" => "string",
-            "data"    => "object",
-            "meta"    => ["optional", "object"],
+            "Type"       => "string",
+            "Version"    => "string",
+            "Parameters" => ["either", {"choices"   => ["array", "object"]} ],
+            "Metadata"   => ["optional", "object"],
           }
         }]
       }
@@ -59,14 +59,14 @@ module Poppet
         "_#{type}_#{version}" => ["object",
           {
             "members" =>
-              { "data"       => "_#{type}_data_#{version}",
-                "meta"       => "_#{type}_meta_#{version}",
-                "type"       => ( abstract ? "string" : ["literal", type] ),
-                "version"    => ["literal", version.to_s],
+              { "Parameters" => "_#{type}_Parameters_#{version}",
+                "Metadata"   => "_#{type}_Metadata_#{version}",
+                "Type"       => ( abstract ? "string" : ["literal", type] ),
+                "Version"    => ["literal", version.to_s],
               },
           } ],
-        "_#{type}_data_#{version}" => data_def,
-        "_#{type}_meta_#{version}" => meta_def,
+        "_#{type}_Parameters_#{version}" => data_def,
+        "_#{type}_Metadata_#{version}" => meta_def,
       }
     end
   end
