@@ -70,8 +70,8 @@ checker = Poppet::Implementor::Checker.new({
   "content"  => lambda{ |actual_value, desired_value| actual_value == desired_value },
   "checksum" => lambda{ |actual_value, desired_value| actual_value == desired_value },
 
-  "owner"    => lambda{ |actual_value, desired_value| numeric_user(  desired_value ) == numeric_user(  actual_value ) },
-  "group"    => lambda{ |actual_value, desired_value| numeric_group( desired_value ) == numeric_group( actual_value ) },
+  "owner"    => lambda{ |actual_value, desired_value| !actual_value.nil? and numeric_user(  desired_value ) == numeric_user(  actual_value ) },
+  "group"    => lambda{ |actual_value, desired_value| !actual_value.nil? and numeric_group( desired_value ) == numeric_group( actual_value ) },
 
   "mode"     => lambda do |actual_value, desired_value|
                  simulated_chmod( actual_value, desired_value ) == actual_value
@@ -103,15 +103,15 @@ writer = Poppet::Implementor::Writer.new({ # state machine
       actual.merge({
         "exists"  => true,
         "path"    => desired["path"],
-        "mode"    => desired["mode"],
-        "owner"   => desired["owner"],
+        #"mode"    => desired["mode"], # Not implemented yet
+        #"owner"   => desired["owner"], # Not implemented yet,
         "content" => desired["content"]
       })
     end
   ],
 
   "overwrite" => [
-    { "exists" => ["literal", true], "content" => "string" },
+    { "exists" => ["literal", true] },
     lambda do |w, actual, desired|
       write_file( w, desired )
       actual.merge( "content" => desired["content"] )
@@ -119,7 +119,7 @@ writer = Poppet::Implementor::Writer.new({ # state machine
   ],
 
   "chmod" => [
-    { "exists" => ["literal", true], "mode" => "string" },
+    { "exists" => ["literal", true] },
     lambda do |w, actual, desired|
       return unless desired["mode"]
       mod = simulated_chmod( actual["mode"], desired["mode"] )
@@ -129,7 +129,7 @@ writer = Poppet::Implementor::Writer.new({ # state machine
   ],
 
   "chown" => [
-    { "exists" => ["literal", true], "owner" => "string" },
+    { "exists" => ["literal", true] },
     lambda do |w, actual, desired|
       return unless desired["owner"]
       w.execute( "chown #{e desired["owner"] }, #{e desired["path"] } " )
@@ -138,7 +138,7 @@ writer = Poppet::Implementor::Writer.new({ # state machine
   ],
 
   "chgrp" => [
-    { "exists" => ["literal", true], "group" => "string" },
+    { "exists" => ["literal", true] },
     lambda do |w, actual, desired|
       return unless desired["group"]
       w.execute( "chgrp #{e desired["group"]} #{e desired["path"]} " )
