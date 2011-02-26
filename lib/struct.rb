@@ -10,6 +10,14 @@ module Poppet
       validate!
     end
 
+    def to_hash
+      @data
+    end
+
+    def to_json
+      to_hash.to_json
+    end
+
     def by_keys( keys )
       data = @data
       keys.each do |key|
@@ -31,7 +39,7 @@ module Poppet
           "members" => {
             "Type"       => "string",
             "Version"    => "string",
-            "Parameters" => ["either", {"choices"   => ["array", "object"]} ],
+            "Parameters" => "object",
             "Metadata"   => ["optional", "object"],
           }
         }]

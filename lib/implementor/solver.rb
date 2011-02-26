@@ -1,5 +1,6 @@
 require 'lib/resource'
 require 'lib/implementor/implementation'
+require 'lib/changelog'
 
 module Poppet
   class Implementor::Solver < Implementor::Implementation
@@ -68,15 +69,17 @@ module Poppet
 
     def solve( starting_state, max_depth = 10 )
       # breadth-first search: simulate all possible writes
-      choices = [ [ [nil, starting_state] ] ]
+
+      changelog = Poppet::Changelog.new( [ [ nil, starting_state ] ] )
+      choices = [ changelog ]
       max_depth.times do
         choices = choices.map do |history|
-          state = history.last.last
+          state = history.last_state
           return history if ! find_difference( state, @desired )
 
           @writer.rules.map do |name, rule|
             new_state = @writer.simulate( rule, state, @desired )
-            new_history = history + [[name, new_state]]
+            new_history = history.append( [name, new_state] )
             next new_history unless new_state.nil?
           end.compact
 
