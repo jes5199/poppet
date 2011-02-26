@@ -1,6 +1,6 @@
 require 'lib/timestamp'
 require 'lib/storage'
-require 'lib/resource'
+require 'lib/changelog'
 
 settings = {
   :logs => 'public/logs',
@@ -8,9 +8,8 @@ settings = {
 
 # save System to inventory
 # TODO: check identity.
-# TODO: validate schema
 json = STDIN.read
-Poppet::Resource.new( JSON.parse(json) )
+Poppet::Changelog.new( JSON.parse(json) )
 Poppet::Storage.timestamped_file(settings[:logs]) do |f|
   f.print(json)
 end

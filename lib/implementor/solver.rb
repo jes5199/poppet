@@ -53,7 +53,7 @@ module Poppet
     end
 
     def replay( changes )
-      real_state = changes.first[1]
+      real_state = changes.first_state
       changes.map do |rule_name, simulated_result|
         if rule_name
           real_state = @writer.change( @writer.rules[rule_name], real_state, @desired )
@@ -63,14 +63,14 @@ module Poppet
           raise "something went wrong: #{diff}"
         end
 
-        [rule_name , state]
+        [rule_name, real_state]
       end
     end
 
     def solve( starting_state, max_depth = 10 )
       # breadth-first search: simulate all possible writes
 
-      changelog = Poppet::Changelog.new( [ [ nil, starting_state ] ] )
+      changelog = Poppet::Changelog.new( {}, [ [ nil, starting_state ] ] )
       choices = [ changelog ]
       max_depth.times do
         choices = choices.map do |history|
