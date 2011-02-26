@@ -1,5 +1,13 @@
 require 'vendor/json_shape/json_shape'
 module Poppet
+  # Here's the rules:
+  #  anything that derives from Struct is basically a glorified JSON document.
+  #  It's @data variable should be nothing but JSON-acceptable types: hashes, arrays, and scalars
+  #  If it contains other valid structs inside, you can inflate them at access time (rather than storing a reference to a ruby object)
+  #  Try to avoid mutating state that might be in other objects:
+  #     Use (hash = hash.merge) instead of hash.update
+  #     Use (array = array + [x]) instead of (array << x) or array.push(x)
+
   class Struct
     def self.by_keys(data, keys)
       self.new(data).by_keys(keys)
