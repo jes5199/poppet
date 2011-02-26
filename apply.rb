@@ -8,6 +8,7 @@ policy = JSON.parse( ARGV[0] ? File.read(ARGV[0]) : STDIN.read ) # TODO factor o
 
 applier = Poppet::Policy::Applier.new( policy )
 
+# TODO: put information about the policy into the changelog metadata
 history = Poppet::Changelog.new
 applier.each do |res|
   imp = File.join("imp", res["Type"] + ".rb") # TODO: smarter executable finding, extract into lib
