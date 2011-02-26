@@ -12,6 +12,7 @@
 10. OK Command-line save to inventory
 11. OK Directory imp
 12. OK Nicer json-shape error messages
+13. OK System facts from existing fact whatsits.
 
 ## Sciency
 1. TODO Generate report: original system state, actions performed, new system state.
@@ -24,12 +25,11 @@
 1. TODO Don't recreate existing policy files
 2. TODO Some sort of configuration file
 3. TODO Command line parsing
-4. TODO System facts from existing fact whatsits.
-5. TODO various other TODOs scattered around the source.
-6. TODO Too much magic in Implementor::Reader
-7. TODO A second System->System filter to happen on the serverside before System->Policy
-8. TODO Unique filenames for timestamped files
-9. TODO Associate logs with their policies
+4. TODO various other TODOs scattered around the source.
+5. TODO Too much magic in Implementor::Reader
+6. TODO A second System->System filter to happen on the serverside before System->Policy
+7. TODO Unique filenames for timestamped files
+8. TODO Associate logs with their policies
 
 # Instructions
 ## Client/Server
