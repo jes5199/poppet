@@ -28,6 +28,8 @@
 5. TODO various other TODOs scattered around the source.
 6. TODO Too much magic in Implementor::Reader
 7. TODO A second System->System filter to happen on the serverside before System->Policy
+8. TODO Unique filenames for timestamped files
+9. TODO Associate logs with their policies
 
 # Instructions
 ## Client/Server
