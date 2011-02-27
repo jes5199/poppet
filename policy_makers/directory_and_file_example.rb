@@ -28,6 +28,7 @@ print <<-JSON
           "content": "Hello, world, from #{hostname}"
         },
         "Metadata": {
+          "after": ["my directory"]
         }
       }
     }
