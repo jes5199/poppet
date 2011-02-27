@@ -19,9 +19,10 @@
 2. STARTED use GPG
 3. TODO Intelligent graph-walking
 4. TODO Nicer DSL for defining implementors
-5. TODO Multi-resource Imp API ("Install all these packages")
-6. TODO Transient resources
-7. TODO Cross-machine coordination
+5. TODO Multiple implementors for the same type
+6. TODO Multi-resource Imp API ("Install all these packages")
+7. TODO Transient resources
+8. TODO Cross-machine coordination
 
 ## Tedium
 0. TODO json-shape files for data types
