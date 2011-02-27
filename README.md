@@ -19,6 +19,9 @@
 2. STARTED use GPG
 3. TODO Intelligent graph-walking
 4. TODO Nicer DSL for defining implementors
+5. TODO Multi-resource Imp API ("Install all these packages")
+6. TODO Transient resources
+7. TODO Cross-machine coordination
 
 ## Tedium
 0. TODO json-shape files for data types
@@ -30,6 +33,7 @@
 6. TODO A second System->System filter to happen on the serverside before System->Policy
 7. TODO Unique filenames for timestamped files
 8. TODO Associate logs with their policies
+9. TODO Last Known Good policy if can't contact server
 
 # Instructions
 ## Client/Server
