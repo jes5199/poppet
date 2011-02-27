@@ -1,5 +1,11 @@
 #!/usr/bin/ruby
 
+require 'rubygems'
+require 'json'
+facts = JSON.parse( STDIN.read.to_s )
+
+hostname = facts["hostname"]
+
 print <<-JSON
 {
   "Version": "0",
@@ -19,7 +25,9 @@ print <<-JSON
         "Type": "file",
         "Parameters": {
           "path": "/tmp/poppet/file",
-          "content": "Hello, world"
+          "content": "Hello, world, from #{hostname}"
+        },
+        "Metadata": {
         }
       }
     }
