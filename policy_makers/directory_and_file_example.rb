@@ -4,7 +4,7 @@ require 'rubygems'
 require 'json'
 facts = JSON.parse( STDIN.read.to_s )
 
-hostname = facts["hostname"]
+hostname = facts["Parameters"]["hostname"]
 
 print <<-JSON
 {
