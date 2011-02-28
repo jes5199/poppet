@@ -16,7 +16,13 @@ Poppet::Resource::System.new( inventory ) # validates the schema
 
 name_by = ["Parameters"] + settings[:name_by]
 name = Poppet::Struct.by_keys( inventory, name_by )
-policy = Poppet::Policy.new( {}, name )
+
+metadata = {
+  "system_name"   => name,
+  "facts_version" => Poppet::Struct.by_keys( inventory, ["Metadata", "facts_version"] )
+}
+
+policy = Poppet::Policy.new( { "Metadata" => metadata }, name )
 Poppet::Policy::Maker.each(settings[:policy_makers]) do |policy_maker|
   policy = policy.combine( policy_maker.execute( inventory ) )
 end

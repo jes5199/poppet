@@ -21,7 +21,7 @@ module Poppet
           "resources" => ["dictionary", {"contents" => "resource"} ],
           "name"      => "string",
         }],
-        "undefined"
+        ["optional", "object"]
       )
     end
 
@@ -52,7 +52,8 @@ module Poppet
         "Parameters" => {
           "resources"=> combine_resources( self.resources, other.resources ),
           "name"     => self.name || other.name,
-        }
+        },
+        "Metadata" => self.data["Metadata"]
       )
     end
 

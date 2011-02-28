@@ -9,7 +9,7 @@ module Poppet
         "Parameters" => {},
         "Metadata"   => {},
       }.merge(data)
-      @data["Parameters"].merge(facts)
+      @data["Parameters"] = @data["Parameters"].merge(facts)
       validate!
     end
 
