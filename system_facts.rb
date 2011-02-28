@@ -5,7 +5,8 @@ require 'lib/resource/system'
 
 
 settings = {
-  "facts" => './system_facts',
+  "facts"         => './system_facts',
+  "facts_version" => 'git rev-parse HEAD'
 }
 
 facts = {
@@ -25,7 +26,10 @@ Dir.glob( File.join( settings["facts"], "structured", "*" ) ) do |filename|
   facts.merge!( JSON.parse( json ) )
 end
 
-system_resource = Poppet::Resource::System.new(facts)
+version = Poppet::Execute.execute( settings["facts_version"] )
+metadata = { "facts_version" => version }
+
+system_resource = Poppet::Resource::System.new({"Metadata" => metadata}, facts)
 
 puts JSON.dump( system_resource.data )
 
