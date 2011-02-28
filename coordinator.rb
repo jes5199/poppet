@@ -1,11 +1,8 @@
 require 'lib/storage'
 require 'lib/execute'
+require 'lib/settings'
 
-settings = {
-  "inventory" => 'public/inventory',
-  "policy"    => 'public/policy',
-  "name_by"   => ['hostname'],
-}
+settings = Poppet::Settings.new
 
 name_by = ['Parameters'] + settings['name_by']
 

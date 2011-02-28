@@ -3,12 +3,9 @@ require 'lib/execute'
 require 'rubygems'
 require 'json'
 require 'lib/changelog'
+require 'lib/settings'
 
-settings = {
-  "imp"         => './imp',
-  "imp_version" => 'git rev-parse HEAD'
-}
-
+settings = Poppet::Settings.new
 
 policy = JSON.parse( ARGV[0] ? File.read(ARGV[0]) : STDIN.read ) # TODO factor out this pattern
 

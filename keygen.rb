@@ -1,11 +1,7 @@
 require 'lib/execute'
+require 'lib/settings'
 
-settings = {
-  "keys"       => "keys",
-  "key_name"   => "local",
-  "passphrase" => 'poppet',
-}
-
+settings = Poppet::Settings.new
 
 batch_file = settings["keys"] + "/batch.txt"
 passphrase = settings["passphrase"]

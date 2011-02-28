@@ -1,10 +1,9 @@
 require 'rubygems'
 require 'sinatra'
 require 'lib/execute'
+require 'lib/settings'
 
-settings = {
-  "public" => 'public',
-}
+settings = Poppet::Settings.new
 
 set :public, settings["public"]
 

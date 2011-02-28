@@ -1,11 +1,9 @@
 require 'lib/execute'
 require 'lib/http'
+require 'lib/settings'
 
+settings = Poppet::Settings.new
 
-settings = {
-  "server" => 'http://localhost:4567/inventory',
-}
-
-Poppet::HTTP.post(settings["server"], Poppet::Execute.execute('ruby system_facts.rb'))
+Poppet::HTTP.post(settings["inventory_server"], Poppet::Execute.execute('ruby system_facts.rb'))
 
 

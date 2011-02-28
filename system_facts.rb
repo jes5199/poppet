@@ -2,12 +2,9 @@ require 'rubygems'
 require 'json'
 require 'lib/execute'
 require 'lib/resource/system'
+require 'lib/settings'
 
-
-settings = {
-  "facts"         => './system_facts',
-  "facts_version" => 'git rev-parse HEAD'
-}
+settings = Poppet::Settings.new
 
 facts = {
 }

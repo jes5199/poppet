@@ -1,10 +1,9 @@
 require 'lib/timestamp'
 require 'lib/storage'
 require 'lib/changelog'
+require 'lib/settings'
 
-settings = {
-  "logs" => 'public/logs',
-}
+settings = Poppet::Settings.new
 
 # save System to inventory
 # TODO: check identity.
