@@ -17,7 +17,7 @@ module Poppet
     end
 
     def concat( other )
-      self.class.new( {}, self.history + other.history )
+      self.class.new( {"Metadata" => @data["Metadata"]}, self.history + other.history )
     end
 
     def append( entry )
@@ -26,7 +26,7 @@ module Poppet
         resource = resource.to_hash
       end
       entry = [change, resource]
-      self.class.new( {}, self.history + [entry] )
+      self.class.new( {"Metadata" => @data["Metadata"]}, self.history + [entry] )
     end
 
     def map(&blk)

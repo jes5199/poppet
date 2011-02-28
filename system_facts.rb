@@ -26,7 +26,7 @@ Dir.glob( File.join( settings["facts"], "structured", "*" ) ) do |filename|
   facts.merge!( JSON.parse( json ) )
 end
 
-version = Poppet::Execute.execute( settings["facts_version"] )
+version = Poppet::Execute.execute( settings["facts_version"] ).chomp
 metadata = { "facts_version" => version }
 
 system_resource = Poppet::Resource::System.new({"Metadata" => metadata}, facts)

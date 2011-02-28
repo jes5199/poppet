@@ -7,7 +7,8 @@ require 'lib/resource/system'
 
 settings = {
   :policy_makers => "policy_makers/*",
-  :name_by => ['hostname']
+  :name_by => ['hostname'],
+  "policy_version" => 'git rev-parse HEAD'
 }
 
 #TODO validate command line
@@ -17,9 +18,11 @@ Poppet::Resource::System.new( inventory ) # validates the schema
 name_by = ["Parameters"] + settings[:name_by]
 name = Poppet::Struct.by_keys( inventory, name_by )
 
+version = Poppet::Execute.execute( settings["policy_version"] ).chomp
 metadata = {
   "system_name"   => name,
-  "facts_version" => Poppet::Struct.by_keys( inventory, ["Metadata", "facts_version"] )
+  "facts_version" => Poppet::Struct.by_keys( inventory, ["Metadata", "facts_version"] ),
+  "policy_version" => version
 }
 
 policy = Poppet::Policy.new( { "Metadata" => metadata }, name )

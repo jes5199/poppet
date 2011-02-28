@@ -4,14 +4,27 @@ require 'rubygems'
 require 'json'
 require 'lib/changelog'
 
+settings = {
+  "imp"         => './imp',
+  "imp_version" => 'git rev-parse HEAD'
+}
+
+
 policy = JSON.parse( ARGV[0] ? File.read(ARGV[0]) : STDIN.read ) # TODO factor out this pattern
 
 applier = Poppet::Policy::Applier.new( policy )
 
-# TODO: put information about the policy into the changelog metadata
-history = Poppet::Changelog.new
+version = Poppet::Execute.execute( settings["imp_version"] ).chomp
+metadata = {
+  "facts_version"  => Poppet::Struct.by_keys( policy, ["Metadata", "facts_version"]),
+  "system_name"    => Poppet::Struct.by_keys( policy, ["Metadata", "system_name"]),
+  "policy_version" => Poppet::Struct.by_keys( policy, ["Metadata", "policy_version"]),
+  "imp_version"    => version,
+}
+
+history = Poppet::Changelog.new( {"Metadata" => metadata} )
 applier.each do |res|
-  imp = File.join("imp", res["Type"] + ".rb") # TODO: smarter executable finding, extract into lib
+  imp = File.join(settings["imp"], res["Type"] + ".rb") # TODO: smarter executable finding, extract into lib
   results = Poppet::Execute.execute( imp, JSON.dump( [ "change", res ] ) )
   o = Poppet::Changelog.new( JSON.parse( results ) )
   history = history.concat( o )
