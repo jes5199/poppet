@@ -3,10 +3,10 @@ require 'sinatra'
 require 'lib/execute'
 
 settings = {
-  :public    => 'public',
+  "public" => 'public',
 }
 
-set :public, settings[:public]
+set :public, settings["public"]
 
 post '/inventory' do
   Poppet::Execute.execute( "ruby save_inventory.rb", request.body.read )
