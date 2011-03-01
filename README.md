@@ -24,6 +24,7 @@
 7. TODO Transient resources (frontier walking?)
 8. TODO Multi-resource Imp API ("Install all these packages")
 9. TODO Cross-machine coordination
+10. TODO Farm out policy-making
 
 ## Tedium
 0. TODO various other TODOs scattered around the source.

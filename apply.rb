@@ -21,6 +21,7 @@ metadata = {
   "imp_version"    => version,
 }
 
+# TODO: This has gotten way too long to be in an executable.
 history = Poppet::Changelog.new( {"Metadata" => metadata} )
 nudges = {}
 applier.each do |id, res|
