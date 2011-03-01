@@ -10,11 +10,12 @@ module Poppet
 
     def do( command )
       case command
-        when "check"    then check
-        when "survey"   then survey
-        when "simulate" then simulate
-        when "change"   then change
-        when "nudge"    then nudge
+        when "check"          then check
+        when "survey"         then survey
+        when "simulate"       then simulate
+        when "simulate_nudge" then simulate(true)
+        when "change"         then change
+        when "nudge"          then nudge
       end
     end
 
@@ -43,30 +44,36 @@ module Poppet
       res = new_resource( @reader.get( @desired.keys ) )
     end
 
-    def simulate
+    def simulate( nudge = false )
       resource = survey
-      solve( resource )
+      changes = solve( resource )
+
+      changes = try_to_add_nudge(changes) if nudge
+
+      changes
     end
 
-    def change
-      changes = simulate
-      replay( changes )
-    end
-
-    def nudge
-      changes = simulate
+    def try_to_add_nudge(changes)
       if changes.length <= 1 and @writer.rules["nudge"]
         state = changes.first_state
         new_state = @writer.simulate( @writer.rules["nudge"], state, @desired )
         if ! find_difference( state, new_state )
-          STDERR.puts "nudging"
           new_state = @writer.change( @writer.rules["nudge"], state, @desired )
           if new_state
             return changes.append( ["nudge", new_state] )
           end
         end
       end
+      changes
+    end
+
+    def change( nudge = false )
+      changes = simulate(nudge)
       replay( changes )
+    end
+
+    def nudge
+      change(true)
     end
 
     def replay( changes )

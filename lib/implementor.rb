@@ -30,6 +30,11 @@ module Poppet
       Poppet::Changelog.new( results )
     end
 
+    def simulate_nudge( resource )
+      results = execute( ["simulate_nudge", resource.data] )
+      Poppet::Changelog.new( results )
+    end
+
     def initialize(path)
       @path = path
     end
