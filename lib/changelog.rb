@@ -44,6 +44,10 @@ module Poppet
       Poppet::Resource.new( history.last.last )
     end
 
+    def makes_change?
+      history.find{|x| x.first }
+    end
+
     def length
       history.length
     end

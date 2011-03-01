@@ -22,7 +22,7 @@ module Poppet
 
         next unless resource["Metadata"]
 
-        ( resource["Metadata"]["before"] || [] ).each do |other_id|
+        ( ( resource["Metadata"]["before"] || [] ) + (resource["Metadata"]["nudge"] || []) ).each do |other_id|
           children_of[id] << other_id
           num_parents[other_id] += 1
         end
@@ -60,12 +60,10 @@ module Poppet
 
     def each
       # TODO: frontier walking
-      nudges = {}
       topsort do |id, resource|
         STDERR.puts id
         resource_object = Poppet::Resource.new( resource )
-        nudge = nudges[id]
-        yield( resource_object, nudge )
+        yield( id, resource_object )
       end
     end
   end

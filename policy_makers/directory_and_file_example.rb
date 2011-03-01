@@ -30,6 +30,17 @@ print <<-JSON
         "Metadata": {
           "after": ["my directory"]
         }
+      },
+      "my file2": {
+        "Version": "0",
+        "Type": "file",
+        "Parameters": {
+          "path": "/tmp/poppet/file2",
+          "content": "file2"
+        },
+        "Metadata": {
+          "nudge": ["my file"]
+        }
       }
     }
   }

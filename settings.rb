@@ -18,7 +18,6 @@ settings = {
   "policy_server"    => 'http://localhost:4567/policy',
   "policy_version"   => 'git rev-parse HEAD',
   "public"           => 'public',
-  "always_nudge"     => true,
 }
 
 puts settings.to_json
