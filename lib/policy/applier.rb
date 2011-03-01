@@ -62,7 +62,7 @@ module Poppet
       # TODO: frontier walking
       topsort do |id, resource|
         STDERR.puts id
-        yield(resource)
+        yield( Poppet::Resource.new( resource ) )
       end
     end
   end

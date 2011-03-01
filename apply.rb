@@ -1,5 +1,6 @@
 require 'lib/policy/applier'
 require 'lib/execute'
+require 'lib/implementor'
 require 'rubygems'
 require 'json'
 require 'lib/changelog'
@@ -21,9 +22,8 @@ metadata = {
 
 history = Poppet::Changelog.new( {"Metadata" => metadata} )
 applier.each do |res|
-  imp = File.join(settings["imp"], res["Type"] + ".rb") # TODO: smarter executable finding, extract into lib
-  results = Poppet::Execute.execute( imp, JSON.dump( [ "change", res ] ) )
-  o = Poppet::Changelog.new( JSON.parse( results ) )
-  history = history.concat( o )
+  imp = File.join(settings["imp"], res.data["Type"] + ".rb") # TODO: smarter executable finding, extract into lib
+  changes = Poppet::Implementor.new( imp ).change( res )
+  history = history.concat( changes )
 end
 puts history.to_json

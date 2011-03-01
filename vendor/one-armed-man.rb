@@ -113,7 +113,7 @@ def neighbors(s)
                 reqs = reqs[:requires]
             end
             reqs ||= []
-            if reqs.all? { |rd,pd,vd| s[$sd.index([rd,pd]) || fail("#{rd}.#{pd} not in $sd")] == vd } 
+            if reqs.all? { |rd,pd,vd| s[$sd.index([rd,pd]) || fail("#{rd}.#{pd} not in $sd")] == vd }
                 s2 = s.dup
                 s2[i] = v
                 result << [s2,[r,p,v]]
@@ -198,7 +198,7 @@ def make_it_so
         if s.length == 3
             puts "%s.%s <-- %s" % s
         else
-            puts ((("    (%s) "+"  \t%s.%s:%s"*s[1].length).gsub(/((  \t%s.%s:%s){3})/,"\\1\n    ")  % ([s[0]]+state_dimensions.zip(s[1]).flatten)).gsub(/the /,''))
+            puts((("    (%s) "+"  \t%s.%s:%s"*s[1].length).gsub(/((  \t%s.%s:%s){3})/,"\\1\n    ")  % ([s[0]]+state_dimensions.zip(s[1]).flatten)).gsub(/the /,''))
         end
     }
 end
@@ -217,7 +217,7 @@ Hand = A_hand.new('your hand',
         }
     ))
 )
-Fridge   = A_fridge.new('the fridge', 
+Fridge   = A_fridge.new('the fridge',
     :door => :closed,
     :side_effects => [
         [:door,:open,0,5],
@@ -227,7 +227,7 @@ Fridge   = A_fridge.new('the fridge',
         [:door,:closed,:open] => {:takes => 1.second,:requires => [[Hand,:holding,:nothing]]}
     }
 )
-Cupboard = A_cupboard.new('the cupboard', 
+Cupboard = A_cupboard.new('the cupboard',
     :door => :closed,
     :transitions => {
         [:door,:open,:closed] => {:takes => 1.second},
