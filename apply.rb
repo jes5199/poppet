@@ -39,8 +39,9 @@ applier.each do |id, res|
       changes = imp.change( res )
     end
   end
-  if history.makes_change?
-    ( res.data["Metadata"]["nudge"] || [] ).each do
+  if changes.makes_change?
+    ( res.by_keys(["Metadata", "nudge"]) || [] ).each do |nudge_id|
+      STDERR.puts "nudges: #{nudge_id.inspect}"
       nudges[nudge_id] = true
     end
   end

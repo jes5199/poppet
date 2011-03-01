@@ -39,7 +39,8 @@ print <<-JSON
           "content": "file2"
         },
         "Metadata": {
-          "nudge": ["my file"]
+          "nudge": ["my file"],
+          "after": ["my directory"]
         }
       }
     }

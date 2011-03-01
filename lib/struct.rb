@@ -13,6 +13,8 @@ module Poppet
       self.new(data).by_keys(keys)
     end
 
+    attr_reader :data
+
     def initialize( data )
       @data = data
       validate!
@@ -29,6 +31,7 @@ module Poppet
     def by_keys( keys )
       data = @data
       keys.each do |key|
+        return nil if data.nil?
         raise "bad type: #{data.class}" unless data.is_a?(Hash) || data.is_a?(Array)
         raise "bad key: #{key.inspect}" if data.is_a?(Hash) && ! key.is_a?(String)
         raise "bad key for array: #{key.inspect}" if data.is_a?(Array) && ! key.is_a?(Integer)
