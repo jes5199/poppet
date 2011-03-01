@@ -15,6 +15,7 @@ applier = Poppet::Policy::Applier.new( policy )
 version = Poppet::Execute.execute( settings["imp_version"] ).chomp
 metadata = {
   "facts_version"  => Poppet::Struct.by_keys( policy, ["Metadata", "facts_version"]),
+  "facts_timestamp"=> Poppet::Struct.by_keys( policy, ["Metadata", "facts_timestamp"]),
   "system_name"    => Poppet::Struct.by_keys( policy, ["Metadata", "system_name"]),
   "policy_version" => Poppet::Struct.by_keys( policy, ["Metadata", "policy_version"]),
   "imp_version"    => version,

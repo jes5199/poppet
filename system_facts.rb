@@ -3,6 +3,7 @@ require 'json'
 require 'lib/execute'
 require 'lib/resource/system'
 require 'lib/settings'
+require 'lib/timestamp'
 
 settings = Poppet::Settings.new
 
@@ -24,7 +25,10 @@ Dir.glob( File.join( settings["facts"], "structured", "*" ) ) do |filename|
 end
 
 version = Poppet::Execute.execute( settings["facts_version"] ).chomp
-metadata = { "facts_version" => version }
+metadata = {
+  "facts_version"   => version,
+  "facts_timestamp" => Poppet::Timestamp.now
+}
 
 system_resource = Poppet::Resource::System.new({"Metadata" => metadata}, facts)
 

@@ -17,8 +17,9 @@ name = Poppet::Struct.by_keys( inventory, name_by )
 
 version = Poppet::Execute.execute( settings["policy_version"] ).chomp
 metadata = {
-  "system_name"   => name,
-  "facts_version" => Poppet::Struct.by_keys( inventory, ["Metadata", "facts_version"] ),
+  "system_name"    => name,
+  "facts_version"  => Poppet::Struct.by_keys( inventory, ["Metadata", "facts_version"] ),
+  "facts_timestamp"=> Poppet::Struct.by_keys( inventory, ["Metadata", "facts_timestamp"]),
   "policy_version" => version
 }
 
