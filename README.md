@@ -14,6 +14,7 @@
 12. OK Nicer json-shape error messages
 13. OK System facts from existing fact whatsits.
 14. OK Generate report: original system state, actions performed, new system state.
+15. OK Last Known Good policy if can't contact server
 
 ## Sciency
 1. TODO More data in report. (Commands executed, time elapsed)
@@ -36,7 +37,6 @@
 6. TODO A second System->System filter to happen on the serverside before System->Policy
 7. TODO Unique filenames for timestamped files
 8. TODO Find more ways to sort files in public/
-9. TODO Last Known Good policy if can't contact server
 
 # Instructions
 ## Client/Server
