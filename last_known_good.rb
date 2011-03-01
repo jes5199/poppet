@@ -1,11 +1,8 @@
 require 'lib/http'
-require 'lib/execute'
 require 'lib/storage'
 require 'lib/settings'
 
 settings = Poppet::Settings.new
-
-include Poppet::Execute::EscapeWithLittleE
 
 url = ARGV[0] #TODO: validate command lines
 filename = url.sub('http://', '')
