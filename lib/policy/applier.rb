@@ -60,9 +60,12 @@ module Poppet
 
     def each
       # TODO: frontier walking
+      nudges = {}
       topsort do |id, resource|
         STDERR.puts id
-        yield( Poppet::Resource.new( resource ) )
+        resource_object = Poppet::Resource.new( resource )
+        nudge = nudges[id]
+        yield( resource_object, nudge )
       end
     end
   end

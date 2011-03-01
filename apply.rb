@@ -22,18 +22,18 @@ metadata = {
 }
 
 history = Poppet::Changelog.new( {"Metadata" => metadata} )
-applier.each do |res|
+applier.each do |res, nudge|
   imp_file = File.join(settings["imp"], res.data["Type"] + ".rb") # TODO: smarter executable finding, extract into lib
   imp = Poppet::Implementor.new( imp_file )
-  if settings["dry_run"]
-    if settings["always_nudge"]
+  if settings["always_nudge"] || nudge
+    if settings["dry_run"]
       changes = imp.simulate_nudge( res )
     else
-      changes = imp.simulate( res )
+      changes = imp.nudge( res )
     end
   else
-    if settings["always_nudge"]
-      changes = imp.nudge( res )
+    if settings["dry_run"]
+      changes = imp.simulate( res )
     else
       changes = imp.change( res )
     end
