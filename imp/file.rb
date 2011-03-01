@@ -110,6 +110,17 @@ writer = Poppet::Implementor::Writer.new({ # state machine
     end
   ],
 
+  "nudge" => [
+    lambda do |w, actual, desired|
+      w.execute( "touch #{ e desired["path"] }" )
+      actual.merge({
+        "path" => desired["path"],
+        "exists" => true
+      })
+    end
+  ],
+
+
   "overwrite" => [
     { "exists" => ["literal", true] },
     lambda do |w, actual, desired|

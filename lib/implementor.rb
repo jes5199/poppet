@@ -25,6 +25,11 @@ module Poppet
       Poppet::Changelog.new( results )
     end
 
+    def nudge( resource )
+      results = execute( ["nudge", resource.data] )
+      Poppet::Changelog.new( results )
+    end
+
     def initialize(path)
       @path = path
     end

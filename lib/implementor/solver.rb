@@ -14,11 +14,12 @@ module Poppet
         when "survey"   then survey
         when "simulate" then simulate
         when "change"   then change
+        when "nudge"    then nudge
       end
     end
 
     def check
-      diff = find_differences( @reader, @desired )
+      diff = find_difference( @reader, @desired )
       raise diff if diff
       return true
     end
@@ -52,6 +53,22 @@ module Poppet
       replay( changes )
     end
 
+    def nudge
+      changes = simulate
+      if changes.length <= 1 and @writer.rules["nudge"]
+        state = changes.first_state
+        new_state = @writer.simulate( @writer.rules["nudge"], state, @desired )
+        if ! find_difference( state, new_state )
+          STDERR.puts "nudging"
+          new_state = @writer.change( @writer.rules["nudge"], state, @desired )
+          if new_state
+            return changes.append( ["nudge", new_state] )
+          end
+        end
+      end
+      replay( changes )
+    end
+
     def replay( changes )
       real_state = changes.first_state
       changes.map do |rule_name, simulated_result|
@@ -59,7 +76,7 @@ module Poppet
           real_state = @writer.change( @writer.rules[rule_name], real_state, @desired )
         end
 
-        if @paranoid and diff = find_differences( real_state, simulated_result )
+        if @paranoid and diff = find_difference( real_state, simulated_result )
           raise "something went wrong: #{diff}"
         end
 

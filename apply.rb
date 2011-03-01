@@ -23,8 +23,13 @@ metadata = {
 
 history = Poppet::Changelog.new( {"Metadata" => metadata} )
 applier.each do |res|
-  imp = File.join(settings["imp"], res.data["Type"] + ".rb") # TODO: smarter executable finding, extract into lib
-  changes = Poppet::Implementor.new( imp ).change( res )
+  imp_file = File.join(settings["imp"], res.data["Type"] + ".rb") # TODO: smarter executable finding, extract into lib
+  imp = Poppet::Implementor.new( imp_file )
+  if settings["always_nudge"]
+    changes = imp.nudge( res )
+  else
+    changes = imp.change( res )
+  end
   history = history.concat( changes )
 end
 puts history.to_json

@@ -44,6 +44,10 @@ module Poppet
       Poppet::Resource.new( history.last.last )
     end
 
+    def length
+      history.length
+    end
+
     def history
       @data["Parameters"]["history"]
     end
