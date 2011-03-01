@@ -13,27 +13,28 @@
 11. OK Directory imp
 12. OK Nicer json-shape error messages
 13. OK System facts from existing fact whatsits.
+14. OK Generate report: original system state, actions performed, new system state.
 
 ## Sciency
-1. TODO Generate report: original system state, actions performed, new system state.
+1. TODO More data in report. (Commands executed, time elapsed)
 2. STARTED use GPG
-3. TODO Intelligent graph-walking
 4. TODO Nicer DSL for defining implementors
-5. TODO Multiple implementors for the same type
-6. TODO Multi-resource Imp API ("Install all these packages")
-7. TODO Transient resources
-8. TODO Cross-machine coordination
+5. TODO A DSL for writing policies
+6. TODO Multiple implementors for the same type
+7. TODO Transient resources (frontier walking?)
+8. TODO Multi-resource Imp API ("Install all these packages")
+9. TODO Cross-machine coordination
 
 ## Tedium
-0. TODO json-shape files for data types
-1. TODO Don't recreate existing policy files
-2. TODO Some sort of configuration file
+0. TODO various other TODOs scattered around the source.
+1. TODO json-shape files for data types
+2. TODO Don't recreate existing policy files
 3. TODO Command line parsing
-4. TODO various other TODOs scattered around the source.
-5. TODO Too much magic in Implementor::Reader
+4. TODO do_rules is too clever
+5. TODO Too much magic in Implementor::Reader.
 6. TODO A second System->System filter to happen on the serverside before System->Policy
 7. TODO Unique filenames for timestamped files
-8. TODO Associate logs with their policies
+8. TODO Find more ways to sort files in public/
 9. TODO Last Known Good policy if can't contact server
 
 # Instructions
