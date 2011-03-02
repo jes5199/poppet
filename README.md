@@ -1,9 +1,10 @@
 # Ideas
 ## Vital
 1. TODO More data in report. (Commands executed, time elapsed)
-2. STARTED use GPG
-3. TODO Multiple implementors for the same type
-4. TODO Wrapper scripts for common command lines
+2. TODO Propogate errors to the server and to logs
+3. STARTED use GPG
+4. TODO Multiple implementors for the same type
+5. TODO Wrapper scripts for common command lines
 
 ## Sciency
 4. TODO Nicer DSL for defining implementors
