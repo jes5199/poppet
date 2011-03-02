@@ -43,7 +43,7 @@ applier.each do |id, res|
   if changes.makes_change?
     ( res.by_keys(["Metadata", "nudge"]) || [] ).each do |nudge_id|
       STDERR.puts "nudges: #{nudge_id.inspect}"
-      nudges[nudge_id] = true
+      nudges[nudge_id] = true # TODO: this happens too late to implement "nudged_by". Refactor!
     end
   end
   history = history.concat( changes )
