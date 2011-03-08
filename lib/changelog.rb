@@ -18,13 +18,16 @@ module Poppet
     end
 
     def append!(entry)
-      change, resource, log = entry
+      change, resource, extra = entry
       if resource.is_a? Poppet::Resource
         resource = resource.to_hash
       end
       entry = [change, resource]
-      if log
-        entry << log.map do |event|
+      if extra
+        extra = extra.dup
+        entry << extra
+        extra["log"] ||= []
+        extra["log"].map! do |event|
           event.each do |name, value|
             if value.is_a?(Time)
               event[name] = value.to_f

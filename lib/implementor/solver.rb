@@ -86,7 +86,7 @@ module Poppet
           raise "something went wrong: #{diff}"
         end
 
-        [rule_name, real_state, log]
+        [rule_name, real_state, { "log" => log } ]
       end
     end
 
@@ -102,7 +102,7 @@ module Poppet
 
           @writer.action_list.map do |action|
             new_state, log = @writer.simulate( action, state )
-            new_history = history.append( [action, new_state, log] )
+            new_history = history.append( [action, new_state, {"log" => log}] )
             next new_history unless new_state.nil?
           end.compact
 
