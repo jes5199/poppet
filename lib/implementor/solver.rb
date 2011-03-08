@@ -1,5 +1,4 @@
 require 'lib/resource'
-require 'lib/implementor/implementation'
 require 'lib/changelog'
 
 module Poppet

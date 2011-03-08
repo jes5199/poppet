@@ -1,4 +1,3 @@
-require 'lib/implementor/implementation'
 require 'lib/execute'
 
 module Poppet

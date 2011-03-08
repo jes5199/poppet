@@ -1,4 +1,4 @@
-require 'lib/implementor/implementation'
+require 'lib/implementor'
 
 module Poppet
   class Implementor::Checker
