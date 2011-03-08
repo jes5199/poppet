@@ -20,36 +20,51 @@ if ! desired["path"]
 end
 
 # Find the file
-reader = Poppet::Implementor::Reader.new({
-  "path" => lambda { desired["path"] },
+class FileReader < Poppet::Implementor::Reader
+  readers :path, :exists, :mode, :owner, :group, :content, :checksum
 
-  "exists" => lambda { |r| Poppet::Execute.execute_test( "test -e #{ e r["path"] } " ) },
+  include Poppet::Execute::EscapeWithLittleE
 
-  "mode"   => [
-    { "exists" => [ "literal", true ] },
-    lambda { |r| Poppet::Execute.execute( "stat -c %a #{ e r["path"] }" ).chomp }
-  ],
+  def path
+    desired["path"]
+  end
 
-  "owner" => [
-    { "exists" => [ "literal", true ] },
-    lambda { |r| Poppet::Execute.execute( "stat -c %U #{ e r["path"] }" ).chomp }
-  ],
+  def exists
+    Poppet::Execute.execute_test( "test -e #{ e path } " )
+  end
 
-  "group" => [
-    { "exists" => [ "literal", true ] },
-    lambda { |r| Poppet::Execute.execute( "stat -c %G #{ e r["path"] }" ).chomp }
-  ],
+  def mode
+    if exists
+      Poppet::Execute.execute( "stat -c %a #{ e path }" ).chomp
+    end
+  end
 
-  "content" => [
-    { "exists" => [ "literal", true ] },
-    lambda { |r| Poppet::Execute.execute( "cat #{ e r["path"] }" ) }
-  ],
+  def owner
+    if exists
+      Poppet::Execute.execute( "stat -c %U #{ e path }" ).chomp
+    end
+  end
 
-  "checksum" => [
-    { "exists" => [ "literal", true ] },
-    lambda { |r| Poppet::Execute.execute( "md5sum #{ e r["path"] }" ).sub(/\s.*/m, "") }
-  ]
-})
+  def group
+    if exists
+      Poppet::Execute.execute( "stat -c %G #{ e path }" ).chomp
+    end
+  end
+
+  def content
+    if exists
+      Poppet::Execute.execute( "cat #{ e path }" )
+    end
+  end
+
+  def checksum
+    if exists
+       Poppet::Execute.execute( "md5sum #{ e r["path"] }" ).sub(/\s.*/m, "")
+    end
+  end
+end
+
+reader = FileReader.new(desired)
 
 # TODO extract these to lib
 def simulated_chmod( old, new)

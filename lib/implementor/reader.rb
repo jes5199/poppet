@@ -2,19 +2,44 @@ require 'lib/implementor/implementation'
 
 module Poppet
   class Implementor::Reader < Implementor::Implementation
-    def initialize(rules)
-      @rules = rules
-      @known = {}
+    attr_reader :desired
+    def initialize(desired)
+      @desired = desired
+      @known   = {}
+
+      self.class.each_reader do |name,method|
+        (class << self; self ; end).instance_eval do
+          define_method( method ) do
+            @known[name] ||= super
+          end
+        end
+      end
+    end
+
+    def self.readers(*args)
+      @readers ||= {}
+      if args.last.is_a?(Hash)
+        args.pop.each do |name, method|
+          @readers[name.to_s] = method.to_sym
+        end
+      end
+      args.each do |name|
+        @readers[name.to_s] = name.to_sym
+      end
+    end
+
+    def self.each_reader
+      @readers.each do |name, method|
+        yield(name, method)
+      end
+    end
+
+    def self.reader_for(name)
+      @readers[name.to_s]
     end
 
     def [](name)
-      return @known[name] if @known[name]
-
-      rules = @rules[name]
-      r = do_rules(self, rules, self)
-      unless r.nil?
-        @known[name] = r
-      end
+      send( self.class.reader_for(name) )
     end
 
     def get(keys)
