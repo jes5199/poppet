@@ -6,13 +6,10 @@ module Poppet
     def initialize( data = {}, history = [] )
       @data = self.class.empty_data
       @data = @data.merge(data)
-      history = history.map do |change, resource|
-        if resource.is_a? Poppet::Resource
-          resource = resource.to_hash
-        end
-        [change, resource]
+      @data["Parameters"] = @data["Parameters"].merge( "history" => ( @data["Parameters"]["history"].dup ) )
+      history.each do |entry|
+        append!( entry )
       end
-      @data["Parameters"] = @data["Parameters"].merge( "history" => ( @data["Parameters"]["history"] + history ) )
       validate!
     end
 
@@ -20,13 +17,28 @@ module Poppet
       self.class.new( {"Metadata" => @data["Metadata"] || {}}, self.history + other.history )
     end
 
-    def append( entry )
-      change, resource = entry
+    def append!(entry)
+      change, resource, log = entry
       if resource.is_a? Poppet::Resource
         resource = resource.to_hash
       end
       entry = [change, resource]
-      self.class.new( {"Metadata" => @data["Metadata"] || {}}, self.history + [entry] )
+      if log
+        entry << log.map do |event|
+          event.each do |name, value|
+            if value.is_a?(Time)
+              event[name] = value.to_f
+            end
+          end
+        end
+      end
+
+      history << entry
+      self
+    end
+
+    def append( entry )
+      self.class.new( {"Metadata" => @data["Metadata"] || {}}, self.history ).append!(entry)
     end
 
     def map(&blk)
@@ -37,11 +49,11 @@ module Poppet
     end
 
     def first_state
-      Poppet::Resource.new( history.first.last )
+      Poppet::Resource.new( history.first[1] )
     end
 
     def last_state
-      Poppet::Resource.new( history.last.last )
+      Poppet::Resource.new( history.last[1] )
     end
 
     def makes_change?

@@ -36,15 +36,29 @@ module Poppet
     def simulate(name, actual)
       @actual = actual
       @really = Simulate.new
+      @log = []
       method = self.class.action_for(name)
-      send( method ) if method
+      if method
+        [send( method ), @log]
+      end
     end
 
     def change(name, actual)
       @actual = actual
       @really = Really.new
+      @log = []
       method = self.class.action_for(name)
-      send( method ) if method
+      if method
+        [send( method ), @log]
+      end
+    end
+
+    def log(command, start_time, stop_time)
+      @log << {
+        "command"    => command,
+        "start_time" => start_time,
+        "stop_time"  => stop_time
+      }
     end
 
     def really(&blk)
@@ -54,9 +68,12 @@ module Poppet
     end
 
     def execute( command )
+      start_time = Time.now
       really do
         Poppet::Execute.execute( command )
       end
+      stop_time = Time.now
+      log(command, start_time, stop_time)
     end
 
     class Really

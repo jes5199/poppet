@@ -79,14 +79,14 @@ module Poppet
       real_state = changes.first_state
       changes.map do |rule_name, simulated_result|
         if rule_name
-          real_state = @writer.change( rule_name, real_state )
+          real_state, log = @writer.change( rule_name, real_state )
         end
 
         if @paranoid and diff = find_difference( real_state, simulated_result )
           raise "something went wrong: #{diff}"
         end
 
-        [rule_name, real_state]
+        [rule_name, real_state, log]
       end
     end
 
@@ -101,8 +101,8 @@ module Poppet
           return history if ! find_difference( state, @desired )
 
           @writer.action_list.map do |action|
-            new_state = @writer.simulate( action, state )
-            new_history = history.append( [action, new_state] )
+            new_state, log = @writer.simulate( action, state )
+            new_history = history.append( [action, new_state, log] )
             next new_history unless new_state.nil?
           end.compact
 
