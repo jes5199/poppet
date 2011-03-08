@@ -54,11 +54,11 @@ module Poppet
     end
 
     def try_to_add_nudge(changes)
-      if ! changes.makes_change? and @writer.rules["nudge"]
+      if ! changes.makes_change?
         state = changes.first_state
-        new_state = @writer.simulate( @writer.rules["nudge"], state, @desired )
+        new_state = @writer.simulate( "nudge", state )
         if ! find_difference( state, new_state )
-          new_state = @writer.change( @writer.rules["nudge"], state, @desired )
+          new_state = @writer.change( "nudge", state )
           if new_state
             return changes.append( ["nudge", new_state] )
           end
@@ -80,7 +80,7 @@ module Poppet
       real_state = changes.first_state
       changes.map do |rule_name, simulated_result|
         if rule_name
-          real_state = @writer.change( @writer.rules[rule_name], real_state, @desired )
+          real_state = @writer.change( rule_name, real_state )
         end
 
         if @paranoid and diff = find_difference( real_state, simulated_result )
@@ -101,9 +101,9 @@ module Poppet
           state = history.last_state
           return history if ! find_difference( state, @desired )
 
-          @writer.rules.map do |name, rule|
-            new_state = @writer.simulate( rule, state, @desired )
-            new_history = history.append( [name, new_state] )
+          @writer.action_list.map do |action|
+            new_state = @writer.simulate( action, state )
+            new_history = history.append( [action, new_state] )
             next new_history unless new_state.nil?
           end.compact
 

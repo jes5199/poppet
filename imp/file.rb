@@ -100,11 +100,12 @@ class FileChecker < Poppet::Implementor::Checker
 end
 checker = FileChecker.new
 
-def write_file( w, desired )
-  #TODO: sudo
-  #TODO: umode
-  w.execute( "echo -n #{ e desired["content"] } > #{ e desired["path"] } " )
-end
+class FileWriter < Poppet::Implementor::Writer
+  def write_file( desired )
+    #TODO: sudo
+    #TODO: umode
+    execute( "echo -n #{ e desired["content"] } > #{ e desired["path"] } " )
+  end
 
   # TODO extract these to lib
   def simulated_chmod( old, new)
@@ -119,23 +120,21 @@ end
     Poppet::Execute.execute( "getent group #{e grp} | cut -d: -f3" ) # surprisingly ugly!
   end
 
+  actions :delete, :create, :nudge, :overwrite, :chmod, :chown, :chgrp
 
-writer = Poppet::Implementor::Writer.new({ # state machine
-  "delete" => [
-    {"exists" => ["literal", true]},
-    lambda do |w, actual, desired|
-      w.execute( "rm #{ e desired["path"] }" ) # in traditional unix style, let's remove files and symlinks but not directories.
+  def delete
+    if actual["exists"]
+      execute( "rm #{ e desired["path"] }" ) # in traditional unix style, let's remove files and symlinks but not directories.
       actual.merge({
-        "path" => desired["path"],
+        "path"   => desired["path"],
         "exists" => false
       })
     end
-  ],
+  end
 
-  "create" => [
-    {"exists" => ["literal", false]},
-    lambda do |w, actual, desired|
-      write_file( w, desired )
+  def create
+    if not actual["exists"]
+      write_file( desired )
       actual.merge({
         "exists"  => true,
         "path"    => desired["path"],
@@ -144,54 +143,48 @@ writer = Poppet::Implementor::Writer.new({ # state machine
         "content" => desired["content"]
       })
     end
-  ],
+  end
 
-  "nudge" => [
-    lambda do |w, actual, desired|
-      w.execute( "touch #{ e desired["path"] }" )
-      actual.merge({
-        "path" => desired["path"],
-        "exists" => true
-      })
-    end
-  ],
+  def nudge
+    execute( "touch #{ e desired["path"] }" )
+    actual.merge({
+      "path" => desired["path"],
+      "exists" => true
+    })
+  end
 
-
-  "overwrite" => [
-    { "exists" => ["literal", true] },
-    lambda do |w, actual, desired|
-      write_file( w, desired )
+  def overwrite
+    if actual["exists"]
+      write_file( desired )
       actual.merge( "content" => desired["content"] )
     end
-  ],
+  end
 
-  "chmod" => [
-    { "exists" => ["literal", true] },
-    lambda do |w, actual, desired|
+  def chmod
+    if actual["exists"]
       return unless desired["mode"]
       mod = simulated_chmod( actual["mode"], desired["mode"] )
-      w.execute( "chmod #{e desired["mode"] } #{ e desired["path"] }" )
+      execute( "chmod #{e desired["mode"] } #{ e desired["path"] }" )
       actual.merge( "mode" => mod )
     end
-  ],
+  end
 
-  "chown" => [
-    { "exists" => ["literal", true] },
-    lambda do |w, actual, desired|
+  def chown
+    if actual["exists"]
       return unless desired["owner"]
-      w.execute( "chown #{e desired["owner"] }, #{e desired["path"] } " )
+      execute( "chown #{e desired["owner"] }, #{e desired["path"] } " )
       actual.merge( "owner" => desired["owner"] )
     end
-  ],
+  end
 
-  "chgrp" => [
-    { "exists" => ["literal", true] },
-    lambda do |w, actual, desired|
+  def chgrp
+    if actual["exists"]
       return unless desired["group"]
-      w.execute( "chgrp #{e desired["group"]} #{e desired["path"]} " )
+      execute( "chgrp #{e desired["group"]} #{e desired["path"]} " )
       actual.merge( "group" => desired["group"] )
     end
-  ]
-})
+  end
+end
+writer = FileWriter.new( desired )
 
 puts Poppet::Implementor::Solver.new( desired, reader, checker, writer ).do( command ).to_json
