@@ -2,7 +2,7 @@ require 'lib/implementor/implementation'
 require 'lib/execute'
 
 module Poppet
-  class Implementor::Writer < Implementor::Implementation
+  class Implementor::Writer
     attr_reader :desired, :actual
 
     def initialize(desired)

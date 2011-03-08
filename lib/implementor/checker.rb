@@ -1,10 +1,7 @@
 require 'lib/implementor/implementation'
 
 module Poppet
-  class Implementor::Checker < Implementor::Implementation
-    def initialize
-    end
-
+  class Implementor::Checker
     def check(name, actual, desired)
       method = self.class.checker_for(name)
       if self.respond_to? method

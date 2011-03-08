@@ -3,7 +3,7 @@ require 'lib/implementor/implementation'
 require 'lib/changelog'
 
 module Poppet
-  class Implementor::Solver < Implementor::Implementation
+  class Implementor::Solver
     def initialize( desired, reader, checker, writer )
       @desired, @reader, @checker, @writer = desired, reader, checker, writer
     end

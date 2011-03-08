@@ -1,7 +1,7 @@
 require 'lib/implementor/implementation'
 
 module Poppet
-  class Implementor::Reader < Implementor::Implementation
+  class Implementor::Reader
     attr_reader :desired
     def initialize(desired)
       @desired = desired
