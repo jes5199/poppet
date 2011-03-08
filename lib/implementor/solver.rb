@@ -78,6 +78,7 @@ module Poppet
     def replay( changes )
       real_state = changes.first_state
       changes.map do |rule_name, simulated_result|
+        start_time = Time.now
         if rule_name
           real_state, log = @writer.change( rule_name, real_state )
         end
@@ -86,7 +87,8 @@ module Poppet
           raise "something went wrong: #{diff}"
         end
 
-        [rule_name, real_state, { "log" => log } ]
+        stop_time = Time.now
+        [rule_name, real_state, { "log" => log , "start_time" => start_time.to_f, "stop_time" => stop_time.to_f } ]
       end
     end
 

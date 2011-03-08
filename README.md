@@ -21,6 +21,7 @@
 6. TODO A second System->System filter to happen on the serverside before System->Policy
 7. TODO Unique filenames for timestamped files
 8. TODO Find more ways to sort files in public/
+9. TODO Model changelog entries as Structs
 
 # Instructions
 ## Client/Server
