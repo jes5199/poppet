@@ -66,38 +66,59 @@ end
 
 reader = FileReader.new(desired)
 
-# TODO extract these to lib
-def simulated_chmod( old, new)
-  new #TODO: smart chmods
+class FileChecker < Poppet::Implementor::Checker
+  # TODO extract these to lib
+  def simulated_chmod( old, new)
+    new #TODO: smart chmods
+  end
+
+  def numeric_user( user )
+    Poppet::Execute.execute( "id -u #{e user}" )
+  end
+
+  def numeric_group( grp )
+    Poppet::Execute.execute( "getent group #{e grp} | cut -d: -f3" ) # surprisingly ugly!
+  end
+
+  checkers :path, :exists, :mode, :owner, :group, :content, :checksum
+
+  def owner(actual_value, desired_value)
+    if ! actual_value.nil?
+      numeric_user( desired_value ) == numeric_user( actual_value )
+    end
+  end
+
+  def group(actual_value, desired_value)
+    if ! actual_value.nil?
+      numeric_group( desired_value ) == numeric_group( actual_value )
+    end
+  end
+
+  def mode(actual_value, desired_value)
+    simulated_chmod( actual_value, desired_value ) == actual_value
+  end
 end
-
-def numeric_user( user )
-  Poppet::Execute.execute( "id -u #{e user}" )
-end
-
-def numeric_group( grp )
-  Poppet::Execute.execute( "getent group #{e grp} | cut -d: -f3" ) # surprisingly ugly!
-end
-
-checker = Poppet::Implementor::Checker.new({
-  "path"     => lambda{ |actual_value, desired_value| actual_value == desired_value },
-  "exists"   => lambda{ |actual_value, desired_value| actual_value == desired_value },
-  "content"  => lambda{ |actual_value, desired_value| actual_value == desired_value },
-  "checksum" => lambda{ |actual_value, desired_value| actual_value == desired_value },
-
-  "owner"    => lambda{ |actual_value, desired_value| !actual_value.nil? and numeric_user(  desired_value ) == numeric_user(  actual_value ) },
-  "group"    => lambda{ |actual_value, desired_value| !actual_value.nil? and numeric_group( desired_value ) == numeric_group( actual_value ) },
-
-  "mode"     => lambda do |actual_value, desired_value|
-                 simulated_chmod( actual_value, desired_value ) == actual_value
-                end,
-})
+checker = FileChecker.new
 
 def write_file( w, desired )
   #TODO: sudo
   #TODO: umode
   w.execute( "echo -n #{ e desired["content"] } > #{ e desired["path"] } " )
 end
+
+  # TODO extract these to lib
+  def simulated_chmod( old, new)
+    new #TODO: smart chmods
+  end
+
+  def numeric_user( user )
+    Poppet::Execute.execute( "id -u #{e user}" )
+  end
+
+  def numeric_group( grp )
+    Poppet::Execute.execute( "getent group #{e grp} | cut -d: -f3" ) # surprisingly ugly!
+  end
+
 
 writer = Poppet::Implementor::Writer.new({ # state machine
   "delete" => [

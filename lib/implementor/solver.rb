@@ -28,7 +28,7 @@ module Poppet
     def find_difference( state, des )
       des.keys.each do |key|
         next if des[key].nil?
-        return "#{key} is #{state[key]}, doesn't match #{des[key]}" unless @checker.check(key, state, des)
+        return "#{key} is #{state[key]}, doesn't match #{des[key]}" unless @checker.check(key, state[key], des[key])
       end
       return nil
     end
