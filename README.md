@@ -1,6 +1,6 @@
 # Ideas
 ## Vital
-2. TODO Propogate errors to the server and to logs
+2. TODO Propagate errors to the server and to logs
 3. STARTED use GPG
 4. TODO Multiple implementors for the same type
 5. TODO Wrapper scripts for common command lines
