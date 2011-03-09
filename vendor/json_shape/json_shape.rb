@@ -87,6 +87,9 @@ module JsonShape
           schema_check( entry, kind.contents, schema, path + [i] )
         end
       end
+      if kind.length?
+        schema_check( object.length, kind.length, schema, path + ["_length_"] )
+      end
 
     when IsDefinition["object"]
       object.is_a?(Hash) or failure["not an object"]
