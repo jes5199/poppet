@@ -59,7 +59,7 @@ module Poppet
 
     private
     def combine_resources(r1, r2)
-      dups = r1.keys - r2.keys
+      dups = r1.keys & r2.keys
       raise "duplicate resource keys #{dups.inspect}" if ! dups.empty?
       r1.merge(r2)
     end
