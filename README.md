@@ -6,7 +6,7 @@
 5. TODO Wrapper scripts for common command lines
 
 ## Sciency
-5. TODO A DSL for writing policies
+5. TODO A non-ruby DSL for writing policies
 7. TODO Transient resources (frontier walking?)
 8. TODO Multi-resource Imp API ("Install all these packages")
 9. TODO Cross-machine coordination
