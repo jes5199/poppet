@@ -55,9 +55,9 @@ module Poppet
     def try_to_add_nudge(changes)
       if ! changes.makes_change?
         state = changes.first_state
-        new_state = @writer.simulate( "nudge", state )
+        new_state, logs = @writer.simulate( "nudge", state )
         if ! find_difference( state, new_state )
-          new_state = @writer.change( "nudge", state )
+          new_state, logs = @writer.change( "nudge", state )
           if new_state
             return changes.append( ["nudge", new_state] )
           end

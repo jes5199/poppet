@@ -44,18 +44,21 @@ class PolicyResource
     $resources[@name]["Metadata"] ||= {}
     $resources[@name]["Metadata"]["after"] ||= []
     $resources[@name]["Metadata"]["after"] << res.to_s
+    self
   end
 
   def before( res )
     $resources[@name]["Metadata"] ||= {}
     $resources[@name]["Metadata"]["before"] ||= []
     $resources[@name]["Metadata"]["before"] << res.to_s
+    self
   end
 
   def nudge( res )
     $resources[@name]["Metadata"] ||= {}
     $resources[@name]["Metadata"]["nudge"] ||= []
     $resources[@name]["Metadata"]["nudge"] << res.to_s
+    self
   end
 
 end
