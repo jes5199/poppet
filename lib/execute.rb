@@ -46,6 +46,16 @@ module Poppet
       end
     end
 
+    module ExecuteWithLittleX
+      def x( *args )
+        Poppet::Execute.execute( *args )
+      end
+
+      def xt( string )
+        Poppet::Execute.execute_test( *args )
+      end
+    end
+
     class Error < RuntimeError
     end
   end
