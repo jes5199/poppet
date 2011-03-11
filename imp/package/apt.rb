@@ -5,15 +5,15 @@ implementor do |desired|
     raise "A package must be identified by name"
   end
 
-  class PackageReader < reader_class
-    readers :name, :versions, :status, :dpkg_query
+  self.reader_class = class PackageReader < Poppet::Implementor::Reader
+    readers :name, :versions, :status
 
     def name
       desired["name"]
     end
 
     def dpkg_query
-      x( "dpkg-query #{e name}" ).split(/\n/) rescue []
+      @dpkg_query ||= x( "dpkg-query -s #{e name}" ).split(/\n/) rescue []
     end
 
     def versions
@@ -32,9 +32,11 @@ implementor do |desired|
         "absent"
       end
     end
+
+    self
   end
 
-  class PackageChecker < checker_class
+  self.checker_class = class PackageChecker < Poppet::Implementor::Checker
     checkers :name, :versions, :status
 
     def versions(actual_value, desired_value)
@@ -47,9 +49,11 @@ implementor do |desired|
       return true if desired_value == "configured" && actual_value == "absent" # because we don't actually want to install and uninstall just to drop config files
       desired_value == actual_value
     end
+
+    self
   end
 
-  class PackageWriter < writer_class
+  self.writer_class = class PackageWriter < Poppet::Implementor::Writer
     actions :install, :nudge, :remove, :purge
 
     def apt_get(args)
@@ -61,18 +65,19 @@ implementor do |desired|
     end
 
     def install( extra_args = nil )
-      raise "apt can only install one version at a time" if desired["vesions"].length > 1
+      versions = ( desired["vesions"] || [] )
+      raise "apt can only install one version at a time" if versions.length > 1
 
-      version = desired["versions"].first
-      if version == "latest"
+      version = versions.first
+      if version == "latest" or !version
         name = e desired["name"]
       else
         name = "#{e desired["name"]}=#{e version}"
       end
       apt_get_install( "#{name} #{extra_args}" )
       actual.merge({
-        "state"    => "installed",
-        "versions" => [ version ] # TODO: something smarter re:latest ?
+        "status"   => "installed",
+        "versions" => [ version || "latest" ] # TODO: actually resolve "latest" ?
       })
     end
 
@@ -84,7 +89,7 @@ implementor do |desired|
       apt_get( "remove #{ e desired["name"] }" )
 
       actual.merge({
-        "state"    => "configured",
+        "status"   => "configured",
         "versions" => nil
       })
     end
@@ -93,10 +98,11 @@ implementor do |desired|
       apt_get( "purge #{ e desired["name"] }" )
 
       actual.merge({
-        "state"    => "absent",
+        "status"   => "absent",
         "versions" => nil
       })
     end
 
+    self
   end
 end

@@ -76,6 +76,10 @@ module Poppet
       log(command, start_time, stop_time)
     end
 
+    def x( command )
+      execute( command )
+    end
+
     class Really
       def really
         yield
