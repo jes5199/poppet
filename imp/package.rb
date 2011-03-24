@@ -2,29 +2,25 @@
 
 require 'rubygems'
 require 'json'
-require 'lib/implementor/subimp'
+require 'lib/implementor/dispatcher'
 require 'lib/settings'
 
 settings = Poppet::Settings.new
 
 command, desired_json = JSON.parse( STDIN.read )
 
-class PackageImp < Poppet::Implementor::Subimp
+class PackageImp < Poppet::Implementor::Dispatcher
   def subimplementor
     subimplementor = resource["implementor"]
 
-    if ! subimplementor
-      subimplementor = case resource["package_type"]
-      when "deb"
-        "apt"
-      when "gem"
-        "gem"
-      end
+    subimplementor ||= case resource["package_type"]
+    when "deb"
+      "apt"
+    when "gem"
+      "gem"
     end
 
-    if ! subimplementor
-      raise "You must supply a package_type"
-    end
+    subimplementor or raise "You must supply a package_type"
 
     return subimplementor
   end

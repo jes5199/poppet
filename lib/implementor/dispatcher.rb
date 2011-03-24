@@ -5,7 +5,7 @@ require 'lib/implementor'
 
 module Poppet
   class Implementor
-    class Subimp
+    class Dispatcher
       attr :resource
 
       def initialize( resource_json, options )
