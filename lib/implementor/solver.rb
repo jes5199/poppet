@@ -1,5 +1,6 @@
 require 'lib/resource'
 require 'lib/changelog'
+require 'lib/monkey_patches/uniq_by'
 
 module Poppet
   class Implementor::Solver
@@ -92,12 +93,12 @@ module Poppet
       end
     end
 
-    def solve( starting_state, max_depth = 10 )
+    def solve( starting_state, max_depth = 100 )
       # breadth-first search: simulate all possible writes
 
       changelog = Poppet::Changelog.new( {}, [ [ nil, starting_state ] ] )
       choices = [ changelog ]
-      max_depth.times do
+      max_depth.times do |n|
         choices = choices.map do |history|
           state = history.last_state
           return history if ! find_difference( state, @desired )
@@ -108,7 +109,7 @@ module Poppet
             next new_history unless new_state.nil?
           end.compact
 
-        end.inject([]){|a,b| a + b}
+        end.inject([]){|a,b| a + b}.uniq_by{ choices.last.last_state.data }
       end
       raise "no solution found."
     end

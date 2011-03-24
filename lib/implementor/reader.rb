@@ -10,7 +10,7 @@ module Poppet
       self.class.each_reader do |name,method|
         (class << self; self ; end).instance_eval do
           define_method( method ) do
-            @known[name] ||= super
+            @known[name] ||= super()
           end
         end
       end
