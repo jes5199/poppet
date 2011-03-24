@@ -18,7 +18,7 @@ module Poppet
       end
 
       def execute(*args)
-        imp_file = File.join(@options["imp"], resource.data["Type"], subimplementor + ".rb") # TODO: smarter executable finding, extract into lib
+        imp_file = File.join(@options["imp_directory"], resource.data["Type"], subimplementor + ".rb") # TODO: smarter executable finding, extract into lib
         imp = Poppet::Implementor.new( imp_file )
         JSON.dump( imp.execute( *args ) )
       end

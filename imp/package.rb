@@ -26,5 +26,5 @@ class PackageImp < Poppet::Implementor::Dispatcher
   end
 end
 
-subimp = PackageImp.new( desired_json, {"imp" => settings["imp"]} )
+subimp = PackageImp.new( desired_json, {"imp_directory" => settings["imp"]} )
 print subimp.execute( [command, desired_json] )
