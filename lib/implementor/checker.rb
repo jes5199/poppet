@@ -24,7 +24,7 @@ module Poppet
     end
 
     def self.checker_for(name)
-      @checkers[name.to_s]
+      @checkers[name.to_s] or raise "no checker for #{name}"
     end
 
   end

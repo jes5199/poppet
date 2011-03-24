@@ -6,10 +6,14 @@ implementor do |desired|
   end
 
   self.reader_class = class PackageReader < Poppet::Implementor::Reader
-    readers :name, :versions, :status
+    readers :name, :versions, :status, :package_type
 
     def name
       desired["name"]
+    end
+
+    def package_type
+      "gem"
     end
 
     def local_package
@@ -33,7 +37,7 @@ implementor do |desired|
   end
 
   self.checker_class = class PackageChecker < Poppet::Implementor::Checker
-    checkers :name, :versions, :status
+    checkers :name, :versions, :status, :package_type
 
     def versions(actual_value, desired_value)
       desired_value.all? do |des|

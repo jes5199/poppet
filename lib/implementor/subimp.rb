@@ -8,8 +8,9 @@ module Poppet
     class Subimp
       attr :resource
 
-      def initialize( resource_json )
+      def initialize( resource_json, options )
         @resource = Poppet::Resource.new( resource_json )
+        @options = options
       end
 
       def subimplementor
@@ -17,9 +18,9 @@ module Poppet
       end
 
       def execute(*args)
-        imp_file = File.join(settings["imp"], res.data["Type"], subimplementor + ".rb") # TODO: smarter executable finding, extract into lib
+        imp_file = File.join(@options["imp"], resource.data["Type"], subimplementor + ".rb") # TODO: smarter executable finding, extract into lib
         imp = Poppet::Implementor.new( imp_file )
-        imp.execute( *args )
+        JSON.dump( imp.execute( *args ) )
       end
 
     end

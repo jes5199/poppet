@@ -3,6 +3,9 @@
 require 'rubygems'
 require 'json'
 require 'lib/implementor/subimp'
+require 'lib/settings'
+
+settings = Poppet::Settings.new
 
 command, desired_json = JSON.parse( STDIN.read )
 
@@ -22,11 +25,10 @@ class PackageImp < Poppet::Implementor::Subimp
     if ! subimplementor
       raise "You must supply a package_type"
     end
+
+    return subimplementor
   end
 end
 
-subimp = PackageImp.new( desired_json )
-
-imp_file = File.join(settings["imp"], res.data["Type"], subimplementor + ".rb") # TODO: smarter executable finding, extract into lib
-imp = Poppet::Implementor.new( imp_file )
-imp.execute( [command, desired_json] )
+subimp = PackageImp.new( desired_json, {"imp" => settings["imp"]} )
+print subimp.execute( [command, desired_json] )

@@ -35,7 +35,7 @@ module Poppet
     end
 
     def self.reader_for(name)
-      @readers[name.to_s]
+      @readers[name.to_s] or raise "no reader for #{name}"
     end
 
     def [](name)
