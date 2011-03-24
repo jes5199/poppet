@@ -1,9 +1,8 @@
 # Ideas
 ## Vital
-2. TODO Propagate errors to the server and to logs
-3. STARTED use GPG
-4. TODO Multiple implementors for the same type
-5. TODO Wrapper scripts for common command lines
+1. TODO Propagate errors to the server and to logs
+2. STARTED use GPG
+3. TODO Wrapper scripts for common command lines
 
 ## Sciency
 5. TODO A non-ruby DSL for writing policies

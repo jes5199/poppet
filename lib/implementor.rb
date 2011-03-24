@@ -39,7 +39,6 @@ module Poppet
       @path = path
     end
 
-    private
     def execute( data )
       JSON.parse( Poppet::Execute.execute( @path, JSON.dump( data ) ) )
     end

@@ -13,7 +13,7 @@ implementor do |desired|
     end
 
     def dpkg_query
-      @dpkg_query ||= x( "dpkg-query -s #{e name}" ).split(/\n/) rescue []
+      @dpkg_query ||= ( x( "dpkg-query -s #{e name}" ).split(/\n/) rescue [] )
     end
 
     def versions
