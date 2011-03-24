@@ -1,8 +1,19 @@
 require 'lib/policy'
+require 'sha1'
+
 module Poppet
   class Policy::Applier
-    def initialize( *args )
-      @policy = Poppet::Policy.new( *args )
+    def initialize( policy_struct, options = {} )
+      @policy = Poppet::Policy.new( policy_strucy )
+      @options = options.dup
+    end
+
+    def shuffle_key( name )
+      if @options["order_resources_by_name"]
+        name
+      else
+        Digest::SHA1.digest( @options["shuffle_salt"].to_s + name )
+      end
     end
 
     def hash_order(&blk)
@@ -10,7 +21,7 @@ module Poppet
     end
 
     def shuffled(&blk)
-      @policy.resources.to_a.shuffle.each(&blk)
+      @policy.resources.to_a.sort_by{|name, res| shuffle_key(name) }.each(&blk)
     end
 
     def topsort(&blk)
@@ -37,7 +48,7 @@ module Poppet
 
         break if level_parents.empty?
 
-        level_parents.shuffle.each do |id|
+        level_parents.sort_by{|id| shuffle_key(id) }.each do |id|
           blk.call( id, @policy.resources[id] )
         end
 

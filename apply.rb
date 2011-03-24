@@ -10,7 +10,13 @@ settings = Poppet::Settings.new
 
 policy = JSON.parse( ARGV[0] ? File.read(ARGV[0]) : STDIN.read ) # TODO factor out this pattern
 
-applier = Poppet::Policy::Applier.new( policy )
+applier = Poppet::Policy::Applier.new(
+  policy,
+  {
+    "order_resources_by_name" => settings["order_resources_by_name"],
+    "shuffle_salt"            => settings["resource_name_shuffle_salt"],
+  }
+)
 
 version = Poppet::Execute.execute( settings["imp_version"] ).chomp
 metadata = {
