@@ -20,6 +20,9 @@
 7. TODO Unique filenames for timestamped files
 8. TODO Find more ways to sort files in public/
 9. TODO Model changelog entries as Structs
+10. TODO detect cycles in graphs
+11. TODO detect references to non-existent resources
+12. TODO policy.resources should return objects instead of data
 
 # Instructions
 ## Client/Server
