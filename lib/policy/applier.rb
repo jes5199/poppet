@@ -4,7 +4,7 @@ require 'sha1'
 module Poppet
   class Policy::Applier
     def initialize( policy_struct, options = {} )
-      @policy = Poppet::Policy.new( policy_strucy )
+      @policy = Poppet::Policy.new( policy_struct )
       @options = options.dup
     end
 
@@ -69,9 +69,33 @@ module Poppet
       end
     end
 
+    def resources_before(id)
+      ( ( @policy.resources[id]['Metadata'] || {} )['after'] || [] ) + \
+      @policy.resources.find_all do |id2, res|
+        ( ( res['Metadata'] || {} )['before'] || [] ).include?(id)
+      end.map{|id2, res| id2 }
+    end
+
+    def frontier_walk(&blk)
+      done = Hash.new
+      loop do
+        count = 0
+        shuffled do |id, res|
+          next if done[id]
+
+          next if resources_before(id).find{ |before| ! done[before] }
+
+          blk.call(id, res)
+
+          count += 1
+          done[id] = true
+        end
+        break if count == 0
+      end
+    end
+
     def each
-      # TODO: frontier walking
-      topsort do |id, resource|
+      frontier_walk do |id, resource|
         STDERR.puts id
         resource_object = Poppet::Resource.new( resource )
         yield( id, resource_object )
