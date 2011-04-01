@@ -22,7 +22,7 @@ module Poppet
     def check
       diff = find_difference( @reader, @desired )
       raise diff if diff
-      return true
+      return {}
     end
 
     def find_difference( state, des )

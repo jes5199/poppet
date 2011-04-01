@@ -7,6 +7,7 @@ require 'lib/changelog'
 require 'lib/settings'
 
 settings = Poppet::Settings.new
+implement = 'ruby implement.rb' #TODO: setting
 
 policy = JSON.parse( ARGV[0] ? File.read(ARGV[0]) : STDIN.read ) # TODO factor out this pattern
 
@@ -31,21 +32,21 @@ metadata = {
 history = Poppet::Changelog.new( {"Metadata" => metadata} )
 nudges = {}
 applier.each do |id, res|
-  imp_file = File.join(settings["imp"], res.data["Type"] + ".rb") # TODO: smarter executable finding, extract into lib
-  imp = Poppet::Implementor.new( imp_file )
-  if settings["always_nudge"] || nudges[id]
-    if settings["dry_run"]
-      changes = imp.simulate_nudge( res )
-    else
-      changes = imp.nudge( res )
-    end
+  nudge = settings["always_nudge"] || nudges[id]
+  simulate = settings["dry_run"]
+  action = case
+  when simulate && nudge
+    'simulate_nudge'
+  when !simulate && nudge
+    'nudge'
+  when simulate && !nudge
+    'simulate'
   else
-    if settings["dry_run"]
-      changes = imp.simulate( res )
-    else
-      changes = imp.change( res )
-    end
+    'change'
   end
+  data = [action, res.data]
+  changes_data = JSON.parse( Poppet::Execute.execute( implement, JSON.dump( data ) ) )
+  changes = Poppet::Changelog.new(changes_data)
   if changes.makes_change?
     ( res.by_keys(["Metadata", "nudge"]) || [] ).each do |nudge_id|
       STDERR.puts "nudges: #{nudge_id.inspect}"
