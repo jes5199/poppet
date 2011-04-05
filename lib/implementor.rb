@@ -15,8 +15,8 @@ module Poppet
       Poppet::Resource.new( execute( ["survey", resource.data] ) )
     end
 
-    def simulate( resource )
-      results = execute( ["simulate", resource.data] )
+    def simulate( resource, extra = {} )
+      results = execute( ["simulate", resource.data, extra] )
       Poppet::Changelog.new( results )
     end
 

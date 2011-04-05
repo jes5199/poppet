@@ -11,7 +11,7 @@ require 'lib/implementor/solver'
 
 include Poppet::Execute::EscapeWithLittleE
 
-command, desired_json = JSON.parse( STDIN.read )
+command, desired_json, *extra = JSON.parse( STDIN.read )
 desired = Poppet::Resource.new( desired_json )
 
 # Question: should we support finding files by things other than path?
@@ -187,4 +187,4 @@ class FileWriter < Poppet::Implementor::Writer
 end
 writer = FileWriter.new( desired )
 
-puts Poppet::Implementor::Solver.new( desired, reader, checker, writer ).do( command ).to_json
+puts Poppet::Implementor::Solver.new( desired, reader, checker, writer ).do( command, *extra ).to_json

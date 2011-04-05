@@ -1,5 +1,6 @@
 require 'lib/struct'
 require 'lib/resource'
+require 'lib/monkey_patches/hash_map'
 
 module Poppet
   class Policy < Struct
@@ -35,8 +36,9 @@ module Poppet
         }
       }
     end
+
     def resources
-      @data["Parameters"]["resources"]
+      @data["Parameters"]["resources"].value_map{|k,r| Poppet::Resource.new(r) }
     end
 
     def orderings
@@ -55,6 +57,33 @@ module Poppet
         },
         "Metadata" => self.data["Metadata"]
       )
+    end
+
+    def resources_before( id )
+      res = id.is_a?(String) ? self.resources[id] : self.resources[id[0]].possible_transient_states[id[1]]
+
+      ( res.metadata['after']     || [] ) + \
+      ( res.metadata['nudged_by'] || [] ) + \
+      self.resources.find_all do |id2, res2|
+        ( res2.metadata['before'] || [] ).include?(id) || \
+        ( res2.metadata['nudge']  || [] ).include?(id)
+      end.map{|id2, res| id2 }
+    end
+
+    def do_not_change_unless
+      self.metadata['do_not_change_unless'] || []
+    end
+
+    def transient_resources
+      r = {}
+      self.resources.each do |name, res|
+        res.possible_transient_states.each{|subname, t_res| r[[name,subname]] = t_res}
+      end
+      return r
+    end
+
+    def resources_and_transients
+      resources.merge( transient_resources )
     end
 
     private

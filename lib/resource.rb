@@ -1,10 +1,15 @@
 require 'lib/struct'
+require 'lib/monkey_patches/hash_map'
 module Poppet
   class Resource < Struct
     attr_reader :data
 
     def self.schema
       Struct.schema_for( "resource", "0", "object", ["optional", "object"], "struct", true )
+    end
+
+    def metadata
+      @data["Metadata"] || {}
     end
 
     def [](name)
@@ -37,6 +42,10 @@ module Poppet
         "Parameters" => {
         }
       }
+    end
+
+    def possible_transient_states
+      (metadata['possible_transient_states'] || {}).value_map{|res| self.class.new(res)}
     end
   end
 end

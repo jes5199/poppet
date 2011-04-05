@@ -8,6 +8,18 @@ module Poppet
       @options = options.dup
     end
 
+    def self.default_algorithm
+      :frontier_walk
+    end
+
+    def algorithm
+      @options["algorithm"] || self.class.default_algorithm
+    end
+
+    def using_algorithm(&blk)
+      self.send(algorithm, &blk)
+    end
+
     def shuffle_key( name )
       if @options["order_resources_by_name"]
         name
@@ -31,15 +43,9 @@ module Poppet
       hash_order do |id, resource|
         num_parents[id]
 
-        next unless resource["Metadata"]
-
-        ( ( resource["Metadata"]["before"] || [] ) + (resource["Metadata"]["nudge"] || []) ).each do |other_id|
+        resources_before(id).each do |other_id|
           children_of[id] << other_id
           num_parents[other_id] += 1
-        end
-        ( resource["Metadata"]["after"] || [] ).each do |other_id|
-          children_of[other_id] << id
-          num_parents[id] += 1
         end
       end
 
@@ -70,9 +76,11 @@ module Poppet
     end
 
     def resources_before(id)
-      ( ( @policy.resources[id]['Metadata'] || {} )['after'] || [] ) + \
+      ( @policy.resources[id].metadata['after']     || [] ) + \
+      ( @policy.resources[id].metadata['nudged_by'] || [] ) + \
       @policy.resources.find_all do |id2, res|
-        ( ( res['Metadata'] || {} )['before'] || [] ).include?(id)
+        ( res.metadata['before'] || [] ).include?(id) || \
+        ( res.metadata['nudge'] || [] ).include?(id)
       end.map{|id2, res| id2 }
     end
 
@@ -94,11 +102,17 @@ module Poppet
       end
     end
 
+    def one_armed_man(&blk)
+      # Experimental
+      require 'lib/policy/applier/one_armed_man.rb'
+      searcher = Policy::Applier::OneArmedMan.for_policy( @policy )
+      searcher.search
+    end
+
     def each
-      frontier_walk do |id, resource|
+      using_algorithm do |id, resource|
         STDERR.puts id
-        resource_object = Poppet::Resource.new( resource )
-        yield( id, resource_object )
+        yield( id, resource )
       end
     end
   end

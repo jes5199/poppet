@@ -8,12 +8,12 @@ module Poppet
       @desired, @reader, @checker, @writer = desired, reader, checker, writer
     end
 
-    def do( command )
+    def do( command, extra = {} )
       case command
         when "check"          then check
         when "survey"         then survey
-        when "simulate"       then simulate
-        when "simulate_nudge" then simulate(true)
+        when "simulate"       then simulate(false, extra)
+        when "simulate_nudge" then simulate(true,  extra)
         when "change"         then change
         when "nudge"          then nudge
       end
@@ -44,8 +44,8 @@ module Poppet
       res = new_resource( @reader.get( @desired.keys ) )
     end
 
-    def simulate( nudge = false )
-      resource = survey
+    def simulate( nudge = false, extra = {} )
+      resource = extra["starting_state"] ? Poppet::Resource.new(extra["starting_state"]) : survey
       changes = solve( resource )
 
       changes = try_to_add_nudge(changes) if nudge

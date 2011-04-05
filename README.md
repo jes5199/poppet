@@ -6,7 +6,8 @@
 
 ## Sciency
 5. TODO A non-ruby DSL for writing policies
-7. TODO Transient resources (frontier walking?)
+7. TODO Transient resources
+11. TODO Optional resources
 8. TODO Multi-resource Imp API ("Install all these packages")
 9. TODO Cross-machine coordination
 10. TODO Farm out policy-making
@@ -22,7 +23,7 @@
 9. TODO Model changelog entries as Structs
 10. TODO detect cycles in graphs
 11. TODO detect references to non-existent resources
-12. TODO policy.resources should return objects instead of data
+12. TODO nudged_by should work
 
 # Instructions
 ## Client/Server
