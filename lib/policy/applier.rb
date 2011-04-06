@@ -1,12 +1,15 @@
 require 'lib/policy'
 require 'lib/changelog'
+require 'lib/implementor'
 require 'sha1'
 
 module Poppet
   class Policy::Applier
+    attr :imp
     def initialize( policy_struct, options = {} )
       @policy = Poppet::Policy.new( policy_struct )
       @options = options.dup
+      @imp = Poppet::Implementor.new( options["implement"] )
     end
 
     def self.default_algorithm
@@ -106,7 +109,7 @@ module Poppet
     def one_armed_man(&blk)
       # Experimental
       require 'lib/policy/applier/one_armed_man.rb'
-      searcher = Policy::Applier::OneArmedMan.for_policy( @policy )
+      searcher = Policy::Applier::OneArmedMan.for_policy( @policy, &blk )
       searcher.search
     end
 
@@ -117,6 +120,22 @@ module Poppet
       end
     end
 
+    def implement( resource, simulate, nudge )
+      action = case
+        when simulate && nudge
+          'simulate_nudge'
+        when !simulate && nudge
+          'nudge'
+        when simulate && !nudge
+          'simulate'
+        else
+          'change'
+        end
+      data = [action, resource.data]
+      changes_data = imp.execute( data )
+      changes = Poppet::Changelog.new(changes_data)
+    end
+
     def apply
       history = Poppet::Changelog.new( {"Metadata" => @options["metadata"]} )
       nudges = {}
@@ -124,19 +143,7 @@ module Poppet
       self.each do |id, res|
         nudge = @options["always_nudge"] || nudges[id] || (res.metadata["nudged_by"] || []).any?{|nudged_by| changed[nudged_by]}
         simulate = @options["dry_run"]
-        action = case
-          when simulate && nudge
-            'simulate_nudge'
-          when !simulate && nudge
-            'nudge'
-          when simulate && !nudge
-            'simulate'
-          else
-            'change'
-          end
-          data = [action, res.data]
-          changes_data = JSON.parse( Poppet::Execute.execute( implement, JSON.dump( data ) ) )
-          changes = Poppet::Changelog.new(changes_data)
+          changes = implement( res, simulate, nudge )
           if changes.makes_change?
             ( res.metadata["nudge"] || [] ).each do |nudge_id|
               STDERR.puts "nudges: #{nudge_id.inspect}"

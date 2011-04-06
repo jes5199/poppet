@@ -7,7 +7,6 @@ require 'lib/changelog'
 require 'lib/settings'
 
 settings = Poppet::Settings.new
-implement = 'ruby implement.rb' #TODO: setting
 
 policy = JSON.parse( ARGV[0] ? File.read(ARGV[0]) : STDIN.read ) # TODO factor out this pattern
 
@@ -27,6 +26,7 @@ applier = Poppet::Policy::Applier.new(
     "shuffle_salt"            => settings["resource_name_shuffle_salt"],
     "always_nudge"            => settings["always_nudge"],
     "dry_run"                 => settings["dry_run"],
+    "implement"               => 'ruby implement.rb', #TODO: setting
     "metadata"                => metadata,
   }
 )
