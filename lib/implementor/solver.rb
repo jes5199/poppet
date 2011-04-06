@@ -95,6 +95,7 @@ module Poppet
 
     def solve( starting_state, max_depth = 100 )
       # breadth-first search: simulate all possible writes
+      # TODO: consider switching to A*
 
       changelog = Poppet::Changelog.new( {}, [ [ nil, starting_state ] ] )
       choices = [ changelog ]

@@ -1,4 +1,5 @@
 require 'lib/policy'
+require 'lib/changelog'
 require 'sha1'
 
 module Poppet
@@ -114,6 +115,38 @@ module Poppet
         STDERR.puts id
         yield( id, resource )
       end
+    end
+
+    def apply
+      history = Poppet::Changelog.new( {"Metadata" => @options["metadata"]} )
+      nudges = {}
+      changed = {}
+      self.each do |id, res|
+        nudge = @options["always_nudge"] || nudges[id] || (res.metadata["nudged_by"] || []).any?{|nudged_by| changed[nudged_by]}
+        simulate = @options["dry_run"]
+        action = case
+          when simulate && nudge
+            'simulate_nudge'
+          when !simulate && nudge
+            'nudge'
+          when simulate && !nudge
+            'simulate'
+          else
+            'change'
+          end
+          data = [action, res.data]
+          changes_data = JSON.parse( Poppet::Execute.execute( implement, JSON.dump( data ) ) )
+          changes = Poppet::Changelog.new(changes_data)
+          if changes.makes_change?
+            ( res.metadata["nudge"] || [] ).each do |nudge_id|
+              STDERR.puts "nudges: #{nudge_id.inspect}"
+              nudges[nudge_id] = true
+            end
+            changed[id] = true
+          end
+        history = history.concat( changes )
+      end
+      return history
     end
   end
 end
