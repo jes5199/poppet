@@ -1,4 +1,22 @@
-# Ideas
+# Summary
+Poppet is to Puppet as Sinatra is to Rails. Poppet is a Configuration Management Microframework.
+
+In Poppet, most things are small scripts that accept well-formed JSON on STDIN and output JSON on STDOUT, because Unix + Structure = Awesome.
+
+# Instructions
+## Client/Server
+1. run server.rb on your server # rack app, supplies upload/download access through HTTP
+2. cron coordinator.rb on your server # calculates policies for inventory
+3. cron announce.rb # uploads system information into inventory
+4. cron client.rb   # downloads and applies policy
+
+## Standalone
+1. ruby system_facts.rb  | ruby make_policy.rb  | ruby apply.rb
+
+# Development
+Please submit Pull Requests via Github, because that UI is pretty good actually.
+
+# Ideas/Goals
 ## Vital
 1. TODO Propagate errors to the server and to logs
 2. STARTED use GPG
@@ -24,13 +42,3 @@
 10. TODO detect cycles in graphs
 11. TODO detect references to non-existent resources
 12. TODO nudged_by should work
-
-# Instructions
-## Client/Server
-1. run server.rb on your server # rack app, supplies upload/download access through HTTP
-2. cron coordinator.rb on your server # calculates policies for inventory
-3. cron announce.rb # uploads system information into inventory
-4. cron client.rb   # downloads and applies policy
-
-## Standalone
-1. ruby system_facts.rb  | ruby make_policy.rb  | ruby apply.rb
