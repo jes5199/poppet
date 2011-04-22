@@ -23,6 +23,7 @@ Please submit Pull Requests via Github, because that UI is pretty good actually.
 3. TODO Wrapper scripts for common command lines
 
 ## Sciency
+1. Figure out how to test all this stuff.
 5. TODO A non-ruby DSL for writing policies
 7. TODO Transient resources
 11. TODO Optional resources
