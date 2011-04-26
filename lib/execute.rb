@@ -1,5 +1,3 @@
-require 'lib/execute'
-
 module Poppet
   module Execute
     def self.execute(command, input = "")

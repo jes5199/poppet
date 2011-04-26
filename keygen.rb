@@ -14,6 +14,7 @@ raise "stop!" if File.exist?(pubkey) or File.exist?(private_key)
 
 name = ARGV[0] #TODO: argument parsing
 
+# TODO: move into lib/encrypt.rb
 File.open(batch_file, "w") do |f|
   f.puts <<-BATCH
      %echo Generating a standard key
