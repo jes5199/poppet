@@ -1,156 +1,128 @@
 #!/usr/bin/ruby
 
-require 'rubygems'
-require 'json'
+require 'lib/implementor/helpers'
+class Directory
+  include Poppet::Implementor::Helpers
 
-require 'lib/resource'
-require 'lib/implementor/reader'
-require 'lib/implementor/checker'
-require 'lib/implementor/writer'
-require 'lib/implementor/solver'
+  def initialize( params )
+    @params = params
 
-include Poppet::Execute::EscapeWithLittleE
-
-command, desired_json = JSON.parse( STDIN.read )
-desired = Poppet::Resource.new( desired_json )
-
-if ! desired["path"]
-  raise "Sorry, I don't support finding a directory without a path."
-end
-
-class DirReader < Poppet::Implementor::Reader
-  readers :path, :exists, :mode, :owner, :group
-
-  include Poppet::Execute::EscapeWithLittleE
+    if ! @params["path"]
+      raise "Sorry, I don't support finding a directory without a path."
+    end
+  end
 
   def path
-    desired["path"]
+    @params["path"]
   end
 
   def exists
-    Poppet::Execute.execute_test( "test -d #{ e path } " )
+    safe {
+      Poppet::Execute.execute_test( "test -d #{ e path } " )
+    }
   end
 
   def mode
-    if exists
-      Poppet::Execute.execute( "stat -c %a #{ e path }" ).chomp
-    end
+    safe {
+      if exists
+        Poppet::Execute.execute( "stat -c %a #{ e path }" ).chomp
+      end
+    }
   end
 
   def owner
-    if exists
-      Poppet::Execute.execute( "stat -c %U #{ e path }" ).chomp
-    end
+    safe {
+      if exists
+        Poppet::Execute.execute( "stat -c %U #{ e path }" ).chomp
+      end
+    }
   end
 
   def group
-    if exists
-      Poppet::Execute.execute( "stat -c %G #{ e path }" ).chomp
-    end
+    safe {
+      if exists
+        Poppet::Execute.execute( "stat -c %G #{ e path }" ).chomp
+      end
+    }
   end
-end
-reader = DirReader.new(desired)
 
-class DirChecker < Poppet::Implementor::Checker
   # TODO extract these to lib
   def simulated_chmod( old, new)
     new #TODO: smart chmods
   end
 
   def numeric_user( user )
-    Poppet::Execute.execute( "id -u #{e user}" )
+    return nil unless user
+    safe {
+      Poppet::Execute.execute( "id -u #{e user}" )
+    }
   end
 
   def numeric_group( grp )
-    Poppet::Execute.execute( "getent group #{e grp} | cut -d: -f3" ) # surprisingly ugly!
+    return nil unless grp
+    safe {
+      Poppet::Execute.execute( "getent group #{e grp} | cut -d: -f3" ) # surprisingly ugly!
+    }
   end
 
-  checkers :path, :exists, :mode, :owner, :group
-
-  def owner(actual_value, desired_value)
-    if ! actual_value.nil?
-      numeric_user( desired_value ) == numeric_user( actual_value )
-    end
+  def has_correct_owner?
+    return true unless @params["owner"]
+    numeric_user( @params["owner"] ) == numeric_user( owner )
   end
 
-  def group(actual_value, desired_value)
-    if ! actual_value.nil?
-      numeric_group( desired_value ) == numeric_group( actual_value )
-    end
+  def has_correct_group?
+    return true unless @params["group"]
+    numeric_group( @params["group"] ) == numeric_group( group )
   end
 
-  def mode(actual_value, desired_value)
-    simulated_chmod( actual_value, desired_value ) == actual_value
+  def has_correct_mode?
+    return true unless @params["mode"]
+    simulated_chmod( mode, @params["mode"] ) == mode
   end
-end
-checker = DirChecker.new
 
-class DirWriter < Poppet::Implementor::Writer
-  def mkdir( desired )
+  def create!
     #TODO: sudo
     #TODO: umode
-    execute( "mkdir -p #{ e desired["path"] }" )
+    execute( "mkdir -p #{ e path }" )
   end
 
-  # TODO extract these to lib
-  def simulated_chmod( old, new)
-    new #TODO: smart chmods
+  def delete!
+    execute( "rmdir #{ e path }" ) # in traditional unix style, let's only remove empty dirs
   end
 
-  def numeric_user( user )
-    Poppet::Execute.execute( "id -u #{e user}" )
+  def chmod!
+    execute( "chmod #{e @params["mode"] } #{ e path }" )
   end
 
-  def numeric_group( grp )
-    Poppet::Execute.execute( "getent group #{e grp} | cut -d: -f3" ) # surprisingly ugly!
+  def chown!
+    execute( "chown #{e desired["owner"] } #{e path } " )
   end
 
-  actions :delete, :create, :chmod, :chown, :chgrp
+  def chgrp!
+    execute( "chgrp #{e desired["group"]} #{e path} " )
+  end
 
-  def delete
-    if actual["exists"]
-      execute( "rmdir #{ e desired["path"] }" ) # in traditional unix style, let's only remove empty dirs
-      actual.merge({
-        "path" => desired["path"],
-        "exists" => false
-      })
+  def should_exist?
+    @params["exists"]
+  end
+
+  def run!
+    case
+    when !exists && should_exist?
+      create!
+    when exists && !should_exist?
+      delete!
     end
-  end
 
-  def create
-    if ! actual["exists"]
-      mkdir( desired )
-      actual.merge({
-        "exists"  => true,
-        "path"    => desired["path"],
-        #"mode"    => desired["mode"], # Not implemented yet
-        #"owner"   => desired["owner"], # Not implemented yet
-      })
-    end
-  end
-
-  def chmod
-    if actual["exists"]
-      mod = simulated_chmod( actual["mode"], desired["mode"] )
-      execute( "chmod #{e desired["mode"] } #{ e desired["path"] }" )
-      actual.merge( "mode" => mod )
-    end
-  end
-
-  def chown
-    if actual["exists"]
-      execute( "chown #{e desired["owner"] }, #{e desired["path"] } " )
-      actual.merge( "owner" => desired["owner"] )
-    end
-  end
-
-  def chgrp
-    if actual["exists"]
-      execute( "chgrp #{e desired["group"]} #{e desired["path"]} " )
-      actual.merge( "group" => desired["group"] )
+    if exists
+      chown! if !has_correct_owner?
+      chgrp! if !has_correct_group?
+      chmod! if !has_correct_mode?
     end
   end
 end
-writer = DirWriter.new( desired )
 
-puts Poppet::Implementor::Solver.new( desired, reader, checker, writer ).do( command ).to_json
+if __FILE__ == $0
+  require 'lib/implementor/runner'
+  Poppet::Implementor::Runner.run( Directory, [:path, :exists, :mode, :owner, :group] )
+end
