@@ -1,92 +1,97 @@
 #!/usr/bin/ruby
-require 'lib/implementor/dsl'
-implementor do |desired|
-  if ! desired["name"]
-    raise "A package must be identified by name"
+
+require 'lib/implementor/helpers'
+class Gem
+  include Poppet::Implementor::Helpers
+
+  def initialize(params)
+    @params = params
+    if ! params["name"]
+      raise "A package must be identified by name"
+    end
   end
 
-  self.reader_class = class PackageReader < Poppet::Implementor::Reader
-    readers :name, :versions, :status, :package_type
+  def name
+    @params["name"]
+  end
 
-    def name
-      desired["name"]
-    end
+  def nudge?
+    @params["nudge"]
+  end
 
-    def package_type
-      "gem"
-    end
+  def package_type
+    "gem"
+  end
 
-    def local_package
+  def local_package
+    safe {
       @local_package ||= ( x( "gem list --local  #{e Regexp.escape(name)}" ).split(/\n/) rescue [] )
-    end
-
-    def versions
-      local_package.last =~ /\((.*)\)/
-      $1.split(", ")
-    end
-
-    def status
-      if versions.length > 0
-        "installed"
-      else
-        "absent"
-      end
-    end
-
-    self
+    }
   end
 
-  self.checker_class = class PackageChecker < Poppet::Implementor::Checker
-    checkers :name, :versions, :status, :package_type
-
-    def versions(actual_value, desired_value)
-      desired_value.all? do |des|
-        actual_value.include?(des)
-      end
-    end
-
-    self
+  def versions
+    local_package.last =~ /\((.*)\)/
+    $1.split(", ")
   end
 
-  self.writer_class = class PackageWriter < Poppet::Implementor::Writer
-    actions :install, :nudge, :remove
-
-    def gem(args)
-      x( "gem #{args}" )
+  def status
+    if versions.length > 0
+      "installed"
+    else
+      "absent"
     end
-
-    def gem_install(packages)
-      gem( "install -y #{packages}" )
-    end
-
-    def install( extra_args = nil )
-      versions = ( desired["vesions"] || [] )
-
-      versions.each do |version|
-        if version == "latest" or !version
-          version = ">= 0"
-        end
-        gem_install( "#{e desired["name"]} --version #{e version} #{extra_args}" )
-      end
-      actual.merge({
-        "status"   => "installed",
-        "versions" => versions # TODO: actually resolve "latest" ?
-      })
-    end
-
-    def nudge
-      install
-    end
-
-    def remove
-      gem( "uninstall -a #{ e desired["name"] }" )
-
-      actual.merge({
-        "status"   => "absent",
-        "versions" => nil
-      })
-    end
-
-    self
   end
+
+  def installed?
+    "installed" == status
+  end
+
+  def should_be_installed?
+    @params["status"] == "installed"
+  end
+
+  def needs_to_be_installed?
+    !installed? and should_be_installed?
+  end
+
+  def needs_to_be_uninstalled?
+    !should_be_installed? && installed?
+  end
+
+  def needs_different_version?
+    safe {
+      @params["versions"].any? do |desired_version|
+        ! xt("gem list --local -i #{e Regexp.escape(name)} -v #{e desired_version}")
+      end
+    }
+  end
+
+  def install!
+    versions = ( desired["vesions"] || ["latest"] )
+
+    versions.each do |version|
+      if version == "latest"
+        version = ">= 0"
+      end
+      x( "gem install -y #{e desired["name"]} --version #{e version}" )
+    end
+  end
+
+  def uninstall!
+    x( "gem uninstall -x -a #{ e desired["name"] }" )
+  end
+
+  def run!
+    case
+    when needs_to_be_installed? then install!
+    when needs_to_be_uninstalled? then uninstall!
+    when needs_different_version? then install!
+    when nudge? && installed? then install!
+    end
+  end
+end
+
+if __FILE__ == $0
+  require 'lib/implementor/runner'
+  Poppet::Implementor::Runner.run( Gem, [:name, :package_type, :status, :versions] )
 end

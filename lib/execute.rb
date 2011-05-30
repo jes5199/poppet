@@ -1,6 +1,20 @@
 module Poppet
   module Execute
+    def self.forbid_unsafe_execution!
+      @saved_execution_forbidden = []
+      @execution_forbidden = :raise
+    end
+
+    def self.disable_unsafe_execution!
+      @saved_execution_forbidden = []
+      @execution_forbidden = :suspend
+    end
+
     def self.execute(command, input = "")
+      @execution_forbidden ||= false
+      raise Denied if @execution_forbidden == :raise
+      return if @execution_forbidden == :suspend
+
       output = IO.popen(command, "r+") do |io|
         io.print( input )
         io.close_write
@@ -12,13 +26,24 @@ module Poppet
     end
 
     def self.execute_test( command, input = "" )
-      output = IO.popen(command, "r+") do |io|
-        io.print( input )
-        io.close_write
-        io.read
+      begin
+        execute( command_input )
+        true
+      rescue self::Error
+        false
       end
-      status = $?
-      status == 0
+    end
+
+    def self.safe( &blk )
+      @saved_execution_forbidden ||= []
+      @execution_forbidden ||= false
+      @saved_execution_forbidden.push @execution_forbidden
+      @execution_forbidden = false
+
+      blk.call
+
+      ensure
+      @execution_forbidden = @saved_execution_forbidden.pop
     end
 
     def self.shellescape(str)
@@ -38,6 +63,12 @@ module Poppet
       return str
     end
 
+    module SafeExecuteBlocks
+      def safe( &blk )
+        Poppet::Execute.safe( &blk )
+      end
+    end
+
     module EscapeWithLittleE
       def e( string )
         Poppet::Execute.shellescape( string.to_s )
@@ -55,6 +86,9 @@ module Poppet
     end
 
     class Error < RuntimeError
+    end
+
+    class Denied < RuntimeError
     end
   end
 end
