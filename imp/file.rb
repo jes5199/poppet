@@ -13,73 +13,91 @@ class Phile
     end
   end
 
+  def run!
+    case
+    when !exists? && should_exist?
+      write_file!
+    when exists? && !should_exist?
+      delete!
+    when exists? && !has_correct_content?
+      write_file!
+    end
+
+    if exists?
+      chown! unless has_correct_owner?
+      chgrp! unless has_correct_group?
+      chmod! unless has_correct_mode?
+    end
+  end
+
+
   def path
     @params["path"]
   end
 
-  def exists
+  def exists?
     safe {
-      Poppet::Execute.execute_test( "test -e #{ e path } " )
+      x?( "test -e #{ e path } " )
     }
   end
 
   def mode
-    if exists
+    if exists?
       safe {
-        Poppet::Execute.execute( "stat -c %a #{ e path }" ).chomp
+        x( "stat -c %a #{ e path }" ).chomp
       }
     end
   end
 
   def owner
-    if exists
+    if exists?
       safe {
-        Poppet::Execute.execute( "stat -c %U #{ e path }" ).chomp
+        x( "stat -c %U #{ e path }" ).chomp
       }
     end
   end
 
   def group
-    if exists
+    if exists?
       safe {
-        Poppet::Execute.execute( "stat -c %G #{ e path }" ).chomp
+        x( "stat -c %G #{ e path }" ).chomp
       }
     end
   end
 
   def content
-    if exists
+    if exists?
       safe {
-        Poppet::Execute.execute( "cat #{ e path }" )
+        x( "cat #{ e path }" )
       }
     end
   end
 
   def checksum
-    if exists
+    if exists?
       safe {
         # TODO: work with Mac's `md5`, too
-        Poppet::Execute.execute( "md5sum #{ e path }" ).sub(/\s.*/m, "")
+        x( "md5sum #{ e path }" ).sub(/\s.*/m, "")
       }
     end
   end
 
   # TODO extract these to lib
   def simulated_chmod( old, new)
-    new #TODO: smart chmods
+    new #TODO: simulate chmodding with symbolic modes
   end
 
   def numeric_user( user )
     return nil unless user
     safe {
-      Poppet::Execute.execute( "id -u #{e user}" )
+      x( "id -u #{e user}" )
     }
   end
 
   def numeric_group( grp )
     return nil unless grp
     safe {
-      Poppet::Execute.execute( "getent group #{e grp} | cut -d: -f3" ) # surprisingly ugly!
+      x( "getent group #{e grp} | cut -d: -f3" ) # surprisingly ugly!
     }
   end
 
@@ -111,48 +129,29 @@ class Phile
   end
 
   def delete!
-    if exists
-      execute( "rm #{ e path }" ) # in traditional unix style, let's remove files and symlinks but not directories.
+    if exists?
+      x( "rm #{ e path }" ) # in traditional unix style, let's remove files and symlinks but not directories.
     end
   end
 
   def nudge!
-    execute( "touch #{ e path }" )
+    x( "touch #{ e path }" )
   end
 
   def chmod!
-    execute( "chmod #{e @params["mode"] } #{ e path }" )
+    x( "chmod #{e @params["mode"] } #{ e path }" )
   end
 
   def chown
-    execute( "chown #{e @params["owner"] } #{e path } " )
+    x( "chown #{e @params["owner"] } #{e path } " )
   end
 
   def chgrp
-    execute( "chgrp #{e @params["group"]} #{e path } " )
+    x( "chgrp #{e @params["group"]} #{e path } " )
   end
-
-  def run!
-    case
-    when !exists && should_exist?
-      write_file!
-    when exists && !should_exist?
-      delete!
-    when exists && !has_correct_content?
-      write_file!
-    end
-
-    if exists
-      chown! if !has_correct_owner?
-      chgrp! if !has_correct_group?
-      chmod! if !has_correct_mode?
-    end
-
-  end
-
 end
 
 if __FILE__ == $0
   require 'lib/implementor/runner'
-  Poppet::Implementor::Runner.run( Phile, [:path, :exists, :mode, :owner, :group, :content, :checksum] )
+  Poppet::Implementor::Runner.run( Phile, [:path, :exists?, :mode, :owner, :group, :content, :checksum] )
 end

@@ -83,6 +83,10 @@ module Poppet
       def xt( string )
         Poppet::Execute.execute_test( *args )
       end
+
+      def x?( string )
+        Poppet::Execute.execute_test( *args )
+      end
     end
 
     class Error < RuntimeError
