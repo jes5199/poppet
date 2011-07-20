@@ -24,6 +24,9 @@ Please submit Pull Requests via Github, because that UI is pretty good actually.
 
 ## Sciency
 1. Figure out how to test all this stuff.
+2. Simplify object constuction by keeping metadata separate from objects
+3. Model imperative sections of policy
+4. Use other projects' implementations of complex system calls
 5. TODO A non-ruby DSL for writing policies
 7. TODO Transient resources
 11. TODO Optional resources
@@ -35,7 +38,7 @@ Please submit Pull Requests via Github, because that UI is pretty good actually.
 0. TODO various other TODOs scattered around the source.
 1. TODO json-shape files for data types
 2. TODO Don't recreate existing policy files
-3. TODO Command line parsing
+3. TODO Command line parsing (probably Trollop)
 6. TODO A second System->System filter to happen on the serverside before System->Policy
 7. TODO Unique filenames for timestamped files
 8. TODO Find more ways to sort files in public/
