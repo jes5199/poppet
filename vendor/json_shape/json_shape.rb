@@ -1,20 +1,4 @@
 module JsonShape
-  class IsDefinition
-    attr :name, :params
-
-    def self.[](name)
-      self.new(name)
-    end
-    def initialize(name)
-      @name = name
-    end
-
-    def ===(val)
-      return true if val.name == @name
-    end
-
-  end
-
   class Kind
     attr :name
     attr :params
@@ -44,6 +28,10 @@ module JsonShape
         @params[name]
       end
     end
+
+    def is_definition?(name)
+      self.name == name
+    end
   end
 
   class Failure < ArgumentError
@@ -52,7 +40,7 @@ module JsonShape
     end
 
     def to_s
-      "#{ @message }: #{ @object.inspect } found when expecting #{ @kind.inspect }, at #{ @path.inspect }"
+      "#{ @message }: #{ @object.inspect } found when expecting #{ @kind.inspect }, at #{ @path.join('/') }"
     end
 
     def message
@@ -65,25 +53,29 @@ module JsonShape
 
     failure = lambda{|message| raise Failure.new(message, object, kind, path) }
 
-    case kind
-
+    case
     # simple values
-    when IsDefinition["string"]
+    when kind.is_definition?("string")
       failure["not a string"] unless object.is_a? String
-    when IsDefinition["number"]
+      if kind.matches? and object !~ Regexp.new(kind.matches)
+        failure["does not match /#{kind.matches}/"]
+      end
+    when kind.is_definition?("number")
       failure["not a number"] unless object.is_a? Numeric
-    when IsDefinition["boolean"]
+      failure["less than min #{kind.min}"] if kind.min? and object < kind.min
+      failure["greater than max #{kind.max}"] if kind.max? and object > kind.max
+    when kind.is_definition?("boolean")
       failure["not a boolean"] unless object == true || object == false
-    when IsDefinition["null"]
+    when kind.is_definition?("null")
       failure["not null"] unless object == nil
-    when IsDefinition["undefined"]
+    when kind.is_definition?("undefined")
       object == :undefined or failure["is not undefined"]
 
     # complex values
-    when IsDefinition["array"]
+    when kind.is_definition?("array")
       failure[ "not an array" ] unless object.is_a? Array
-      object.each_with_index do |entry, i|
-        if kind.contents?
+      if kind.contents?
+        object.each_with_index do |entry, i|
           schema_check( entry, kind.contents, schema, path + [i] )
         end
       end
@@ -91,7 +83,7 @@ module JsonShape
         schema_check( object.length, kind.length, schema, path + ["_length_"] )
       end
 
-    when IsDefinition["object"]
+    when kind.is_definition?("object")
       object.is_a?(Hash) or failure["not an object"]
       if kind.members?
         kind.members.each do |name, spec|
@@ -106,27 +98,22 @@ module JsonShape
       end
 
     # obvious extensions
-    when IsDefinition["anything"]
+    when kind.is_definition?("anything")
       object != :undefined or failure[ "is not defined" ]
 
-    when IsDefinition["literal"]
+    when kind.is_definition?("literal")
       object == kind.params or failure[ "doesn't match" ]
 
-    when IsDefinition["integer"]
-      schema_check( object, "number", schema, path)
+    when kind.is_definition?("integer")
+      schema_check( object, ["number", kind.params], schema, path)
       object.is_a?(Integer) or failure[ "is not an integer" ]
 
-    when IsDefinition["enum"]
+    when kind.is_definition?("enum")
       kind.values!.find_index do |value|
         value == object
       end or failure["does not match any choice"]
 
-    when IsDefinition["range"]
-      failure["not a number"] unless object.is_a? Numeric
-      bottom, top = kind.limits!
-      failure["value out of range"] unless (bottom..top).include?(object)
-
-    when IsDefinition["tuple"]
+    when kind.is_definition?("tuple")
       schema_check( object, "array", schema, path )
       failure["tuple is the wrong size"] if object.length > kind.elements!.length
       undefineds = [:undefined] * (kind.elements!.length - object.length)
@@ -135,16 +122,20 @@ module JsonShape
         schema_check( value, spec, schema, path + [i] )
       end
 
-    when IsDefinition["dictionary"]
+    when kind.is_definition?("dictionary")
       schema_check( object, "object", schema, path )
-      if kind.contents?
-        object.each do |key, value|
+
+      object.each do |key, value|
+        if kind.contents?
           schema_check( value, kind.contents, schema, path + [key] )
+        end
+        if kind.keys?
+          schema_check( key, kind.keys, schema, path + [key] )
         end
       end
 
     # set theory
-    when IsDefinition["either"]
+    when kind.is_definition?("either")
       kind.choices!.find_index do |choice|
         begin
           schema_check( object, choice, schema, path )
@@ -154,10 +145,13 @@ module JsonShape
         end
       end or failure["does not match any choice"]
 
-    when IsDefinition["optional"]
+    when kind.is_definition?("optional")
       object == :undefined or schema_check( object, kind.params, schema, path )
 
-    when IsDefinition["restrict"]
+    when kind.is_definition?("nullable")
+      object == nil or schema_check( object, kind.params, schema, path )
+
+    when kind.is_definition?("restrict")
       if kind.require?
         kind.require.each do |requirement|
           schema_check( object, requirement, schema, path )
@@ -175,13 +169,29 @@ module JsonShape
       end
 
     # custom types
+    when schema[kind.name]
+      schema_check( object, schema[kind.name], schema, path )
     else
-      if schema[kind.name]
-        schema_check( object, schema[kind.name], schema, path )
-      else
-        raise "Invalid definition #{kind.inspect}"
-      end
+      raise "Invalid definition #{kind.inspect}"
     end
   end
 end
 
+if __FILE__ == $0
+  require 'rubygems'
+  require 'json'
+
+  schema = JSON.parse( File.read( ARGV[0] ) )
+
+  type = ARGV[1]
+
+  if ARGV[2]
+    stream = File.open(ARGV[2])
+  else
+    stream = STDIN
+  end
+
+  data = JSON.parse( stream.read )
+
+  JsonShape.schema_check( data, type, schema )
+end

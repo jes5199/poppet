@@ -1,0 +1,105 @@
+{
+  "json_shape" : [ "dictionary", {"contents": "definition"}, "A json_shape schema object"  ],
+  "definition" : [ "either", {"choices": ["definition_atom", "definition_singleton", "definition_pair"] } ],
+
+  "builtin_type" : [ "enum", {
+    "values": ["string", "number", "boolean", "null", "undefined", "array", "object", "anything",
+               "literal", "optional", "nullable", "integer", "enum",
+               "tuple", "dictionary", "either", "restrict"
+              ]
+  } ],
+
+  "definition_atom" : [ "either", {
+    "choices": [ "custom_type", "builtin_type_with_optional_parameters", "builtin_type_without_parameters" ]
+  } ],
+
+  "definition_singleton" : [ "tuple", {
+    "elements": [ "definition_atom" ]
+  } ],
+
+  "definition_pair" : ["either", {"choices" :
+    [
+      [ "tuple", {"elements": [ "custom_type",                     ["literal",{}] , "comment"] } ],
+      [ "tuple", {"elements": [ "builtin_type_without_parameters", ["literal",{}] , "comment"] } ],
+
+      [ "tuple", {"elements": [ ["literal", "literal"]   , "anything"             , "comment"] } ],
+      [ "tuple", {"elements": [ ["literal", "optional"]  , "definition"           , "comment"] } ],
+      [ "tuple", {"elements": [ ["literal", "nullable"]  , "definition"           , "comment"] } ],
+
+      [ "tuple", {"elements": [ ["literal", "string"]    , "string_parameters"    , "comment"] } ],
+      [ "tuple", {"elements": [ ["literal", "number"]    , "number_parameters"    , "comment"] } ],
+      [ "tuple", {"elements": [ ["literal", "integer"]   , "integer_parameters"   , "comment"] } ],
+      [ "tuple", {"elements": [ ["literal", "array"]     , "array_parameters"     , "comment"] } ],
+      [ "tuple", {"elements": [ ["literal", "object"]    , "object_parameters"    , "comment"] } ],
+      [ "tuple", {"elements": [ ["literal", "dictionary"], "dictionary_parameters", "comment"] } ],
+      [ "tuple", {"elements": [ ["literal", "restrict"]  , "restrict_parameters"  , "comment"] } ],
+
+      [ "tuple", {"elements": [ ["literal", "enum"]      , "enum_parameters"      , "comment"] } ],
+      [ "tuple", {"elements": [ ["literal", "tuple"]     , "tuple_parameters"     , "comment"] } ],
+      [ "tuple", {"elements": [ ["literal", "either"]    , "either_parameters"    , "comment"] } ]
+    ]
+  } ],
+
+  "comment" : ["optional", "string"],
+
+  "custom_type" : ["restrict", {
+    "require": ["string"],
+    "reject":  ["builtin_type"]
+  } ],
+
+  "builtin_type_without_parameters" : ["enum", {
+    "values": ["boolean", "null", "undefined", "anything"]
+  } ],
+
+  "builtin_type_with_optional_parameters" :  ["enum", {
+    "values": ["string", "number", "integer", "array", "object", "dictionary", "restrict"]
+  } ],
+
+  "builtin_type_with_mandatory_parameters" : ["enum", {
+    "values": ["literal", "optional", "nullable", "enum", "tuple", "either"]
+  } ],
+
+  "optional_definition": [ "optional", "definition" ],
+  "optional_definitions": [ "optional", ["array", {"contents": "definition"} ] ],
+
+  "string_parameters": [ "object", {"members": {"matches": ["optional", "string"] } } ],
+
+  "number_parameters": [ "object", {"members": {"min": ["optional", "number"], "max": ["optional", "number"] } } ],
+
+  "integer_parameters": [ "object", {"members": {"min": ["optional", "integer"], "max": ["optional", "integer"] } } ],
+
+  "array_parameters": [ "object", {"members": {
+    "contents": "optional_definition",
+    "length":   "optional_definition"
+  } } ],
+
+  "object_parameters": [ "object", {"members": {
+    "members": ["optional", ["dictionary", { "contents": "definition"} ] ],
+    "allow_extra":   ["optional", "boolean"],
+    "allow_missing": ["optional", "boolean"]
+  } } ],
+
+  "dictionary_parameters": [ "object", {"members": {"keys": ["optional", "string"], "contents": "optional_definition" } } ],
+
+  "restrict_parameters": [ "object", {"members": {
+    "require" : "optional_definitions",
+    "reject"  : "optional_definitions"
+  } } ],
+
+  "enum_parameters": [ "object", {"members": {
+    "values" : ["array", {"contents": "anything"}]
+  } } ],
+
+  "tuple_parameters": [ "object", {
+    "members" : {
+      "elements" : ["array", {"contents": "definition"}]
+    }
+  } ],
+
+  "either_parameters": [ "object", {
+    "members" : {
+      "choices" : ["array", {"contents": "definition"}]
+    }
+  } ]
+
+}

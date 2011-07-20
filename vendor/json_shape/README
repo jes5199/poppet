@@ -1,0 +1,65 @@
+This is a simple library to test that a JSON document has the form that you expect, which you define using a json document.
+
+Your schema document should be written as a dictionary of "types" that you define, where the key is the name of your type, and the value is a shape predicate.
+A shape predicate is either a string representing the name of a type (either one of your types or a built-in type), or a tuple (an array, really, in JSON), where the first argument is a string (always the name of a built-in type) and the second argument is a parameter for the type (each built-in type defines different valid parameters).
+
+To validate a given JSON document, parse it into a structure of ruby arrays and hashes using a json library of your choice, and pass it to json_shape like so:
+    JsonShape.schema_check( my_parsed_document, base_type, my_parsed_schema_document )
+The schema_document should be a hash that represents your user-defined types.
+The base_type parameter is the name of the type predicate that you expect your document to conform to at the top level object. Since type definitions may be recursive, this is sufficient to validate a document of arbitrary complexity.
+If your document is not a valid member of base_type, an exception will be raised.
+
+It is possible to validate a given json_shape schema using the schema_scheme.js schema. You can validate schema_schema.js by running dogfood.rb .
+
+Valid built-in types are:
+
+"boolean" - matches true or false
+"null" - only matches null (nil in ruby)
+"undefined" - only matches members of a tuple beyond the last entry and absent members of objects
+"anything" - matches anything that isn't "undefined"
+
+"string" - matches any string
+        optional argument object:
+          "matches": an optional string containing a regular expression which the string must match
+
+"number" - matches any number (float or integer)
+        optional argument object:
+          "min": an optional number which the number must be greater than or equal to
+          "max": an optional number which the number must be less than or equal to
+"integer" - only matches whole numbers
+        optional argument object:
+          "min": an optional integer which the integer must be greater than or equal to
+          "max": an optional integer which the integer must be less than or equal to
+
+"array" - matches any array
+        optional argument object:
+          "contents": an optional type predicate that all entires in the array must conform to
+          "length": an optional type predicate that will be applied to the numeric length of the array
+
+"object" - matches any object (hash in ruby)
+        optional argument object:
+          "members": an optional dictionary of type predicates that will be applied to the members of the object for each given key
+          "allow_extra": boolean, whether it is an error if the object has keys that are not mentioned in the "members" dictionary
+          "allow_missing": boolean, whether it is an error if the object does not contain all keys mentioned in the "members" dictionary
+
+"dictionary" - matches any object (hash in ruby)
+        optional argument object:
+          "keys": an optional string containing a regular expression which all keys must conform to
+          "contents": an optional type predicate that all member values in the object must conform to
+"restrict" - matches anything
+        optional argument object:
+          "require": a list of type predicates. The matching value must conform to ALL of the types in the list.
+          "reject": a list of type predicates. The matching value must conform to NONE of the types in the list.
+
+"literal" - takes one parameter. The value must equal the parameter exactly.
+"optional" - takes one type predicate as a parameter. The value must either match the given type, or be undefined.
+"enum" - takes a mandatory argument object:
+        "values": a list of literals. The value must match one of the given literals exactly.
+"tuple" - only matches arrays
+        mandatory argument object:
+          "elements": a list of type predicates. Each entry in the array must match the corresponding type in this list, in order.
+"either" - takes a mandatory argument object:
+        "choices": a list of type predicates. The value must match one of the given types.
+
+
+GPL, copyright Jesse Wolfe and Puppet Labs.
