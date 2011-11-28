@@ -1,4 +1,6 @@
 # Summary
+THIS IS PRE-ALPHA CODE. NO ONE HAS EVER USED IT TO DO ANYTHING.
+
 Poppet is to Puppet as Sinatra is to Rails. Poppet is a Configuration Management Microframework.
 
 In Poppet, most things are small scripts that accept well-formed JSON on STDIN and output JSON on STDOUT, because Unix + Structure = Awesome.
