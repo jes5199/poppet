@@ -1,3 +1,5 @@
+At this point, the Ansible project (by Michael DeHaan) achieves most of my design goals for Poppet. Use that! https://github.com/ansible/ansible
+
 # Summary
 THIS IS PRE-ALPHA CODE. NO ONE HAS EVER USED IT TO DO ANYTHING.
 
